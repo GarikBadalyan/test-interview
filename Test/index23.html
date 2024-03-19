@@ -1,0 +1,47 @@
+<!doctype html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport"
+          content="width=device-width, user-scalable=no, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>Document</title>
+</head>
+<body>
+<script>
+  let arr1 = [
+      { id:'12',
+        name: 'Alex',
+        age: '25'
+      },
+
+      { id:'11',
+        name: 'Jon',
+        age: '26'
+      }
+  ]
+  let arr2 = [
+      { id:'12',
+        name: 'Alex',
+        age: '25'
+      }
+  ]
+
+  function findDifference(arr1, arr2, key) {
+      return arr1.filter(obj1 => !arr2.some(obj2 => obj1[key] === obj2[key]));
+  }
+
+  // Find objects in arr1 that are not in arr2 based on the 'id' key
+  let difference = findDifference(arr1, arr2, 'id');
+  // let difference2 = arr1.filter(obj1 => !arr2.some(obj2 => obj1['id'] === obj2['id']));
+
+  // Display the difference
+  console.log("Objects in arr1 that are not in arr2:");
+  console.log('differenced', difference);
+  // difference.forEach(obj => {
+  //     console.log('obj5', obj)
+  // });
+  console.log('difference[0].id', difference[0].id)
+</script>
+</body>
+</html>

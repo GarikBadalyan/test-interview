@@ -1,0 +1,73 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <style>
+      .partners-container {
+          width: 720px;
+          margin: 0 auto;
+          text-align: center;
+          background: #333; /* Assuming a dark background based on the screenshot */
+          color: #fff;
+          padding: 0 20px 20px 20px;
+          box-sizing: border-box;
+      }
+
+      .partner {
+          display: inline-block;
+          margin: 10px;
+          vertical-align: middle;
+      }
+
+      .partner-logo {
+          width: 100px; /* Adjust based on actual logo sizes */
+          height: auto;
+      }
+
+      .aaa {
+          display: flex;
+          justify-content: space-between;
+          flex-direction: column;
+      }
+
+      .bbb{
+          display: flex;
+          justify-content: space-between;
+      }
+
+      @media (max-width: 720px) {
+          .partners-container {
+              width: 100%;
+          }
+
+          .partner {
+              display: block;
+              margin: 10px auto;
+          }
+      }
+  </style>
+</head>
+<body>
+
+<div class="partners-container">
+  <h2>OUR PARTNERS:</h2>
+  <div class="aaa">
+    <div class="bbb">
+  <div class="partner"><img src="path_to_logo1.png" alt="Partner 1" class="partner-logo"></div>
+  <div class="partner"><img src="path_to_logo2.png" alt="Partner 2" class="partner-logo"></div>
+  <div class="partner"><img src="path_to_logo3.png" alt="Partner 3" class="partner-logo"></div>
+  <div class="partner"><img src="path_to_logo3.png" alt="Partner 4" class="partner-logo"></div>
+    </div>
+    <div class="bbb">
+      <div class="partner"><img src="path_to_logo1.png" alt="Partner 1" class="partner-logo"></div>
+      <div class="partner"><img src="path_to_logo2.png" alt="Partner 2" class="partner-logo"></div>
+      <div class="partner"><img src="path_to_logo3.png" alt="Partner 3" class="partner-logo"></div>
+      <div class="partner"><img src="path_to_logo3.png" alt="Partner 4" class="partner-logo"></div>
+    </div>
+  </div>
+  <!-- Add additional partners here -->
+</div>
+
+</body>
+</html>

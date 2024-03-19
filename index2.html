@@ -1,0 +1,137 @@
+<!doctype html>
+<html lang="en" xmlns="http://www.w3.org/1999/xhtml">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="x-apple-disable-message-reformatting">
+    <title>Document</title>
+</head>
+
+<body style="margin: 0">
+<div align="center" style="display: table; width: 100%; height: 100vh">
+    <div style="display: table-cell;vertical-align: middle">
+        <div style="display: inline-block">
+            <table style="
+          max-width: 600px;
+          height: 569px;
+          border-radius: 12px;
+          border-collapse: separate;
+          border-spacing: 0;
+          overflow: hidden;
+          padding: 28px 26px;
+          ">
+                <tr>
+                    <td>
+                        <table style="width: 100%; border-collapse: separate; border-spacing: 0">
+                            <tr>
+                                <div style="
+                    height: 56px;
+                    width: 536px;
+                    border-bottom: 1px solid #F0F0F0;
+                    font-size: 24px;
+                    text-align: center;
+                    transform: translate(1%, 0)
+                    ">
+                                    <img src="{{config('imgUrls.main_icon_mail')}}" style="width: 120px; height: 32px"/>
+                                </div>
+                            </tr>
+                        </table>
+                    </td>
+                </tr>
+                <tr>
+                    <td>
+                        <table style="width: 100%; height: 100%; border-collapse: separate; border-spacing: 0">
+                            <tr>
+                                <td style="
+                    font-family: 'Inter', sans-serif;
+                    font-style: normal;
+                    font-weight: 400;
+                    font-size: 28px;
+                    line-height: 36px;
+                    color: #37352F;
+                    letter-spacing: 1px;
+                    padding-top: 36px;
+                    text-align: center;
+                    height: 72px;
+                  ">
+                                    Добро пожаловать<br>на Beta-тестирование!
+                                </td>
+                            </tr>
+                            <tr>
+                                <td style="
+                    font-family: 'Inter', sans-serif;
+                    font-style: normal;
+                    font-weight: 400;
+                    font-size: 16px;
+                    line-height: 24px;
+                    color: #37352F;
+                    padding: 44px 8px 24px;
+                    height: 48px">
+                                    Ваш логин для входа в учётную запись: {{$content->username}}. Временный пароль для доступа:
+                                </td>
+                            </tr>
+                            <tr>
+                                <td style="
+                    height: 28px;
+                    font-family: 'Inter', sans-serif;
+                    font-style: normal;
+                    font-weight: 800;
+                    font-size: 24px;
+                    line-height: 28px;
+                    color: #37352F;
+                    padding: 0;
+                    text-align: center
+                  ">
+                                    {{$content->password}}
+                                </td>
+                            </tr>
+                            <tr>
+                                <td style="
+                  font-family: 'Inter', sans-serif;
+                  font-style: normal;
+                  font-weight: 400;
+                  font-size: 16px;
+                  line-height: 24px;
+                  color: #37352F;
+                  padding: 8px 8px 0">
+                                    Для завершения регистрации в системе укажите постоянный пароль перейдя по ссылке ниже:
+                                </td>
+                            </tr>
+                            <tr>
+                                <td style="text-align: center">
+                                    <a href="{{$content->url}}" target="_blank" style="
+                    display: inline-block;
+                    width: 161px;
+                    height: 52px;
+                    background: #39B2E5;
+                    border: 1px solid #39B2E5;
+                    box-shadow: 0 2px 0 rgba(0, 0, 0, 0.043);
+                    border-radius: 4px;
+                    text-decoration: none;
+                    cursor: pointer">
+                                        <p style="
+                        padding: 14px 16px;
+                        margin: 0;
+                        font-family: 'Public Sans';
+                        font-style: normal;
+                        font-weight: 400;
+                        font-size: 16px;
+                        line-height: 24px;
+                        color: #FFFFFF;
+                      ">
+                                            Перейти на сайт
+                                        </p>
+                                    </a>
+                                </td>
+                            </tr>
+                        </table>
+                    </td>
+                </tr>
+            </table>
+        </div>
+    </div>
+</div>
+</body>
+
+</html>

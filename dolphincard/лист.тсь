@@ -1,0 +1,779 @@
+import {useCallback, useEffect, useMemo, useState, Fragment, ReactNode} from 'react';
+// material-ui
+import { alpha, useTheme } from '@mui/material/styles';
+import {
+  Button,
+  Chip,
+  Dialog, SelectChangeEvent,
+  Stack,
+  Table,
+  TableBody,
+  TableCell,
+  TableHead,
+  TableRow,
+  Tooltip,
+  Typography,
+  useMediaQuery
+} from '@mui/material';
+
+import DoneOutlineIcon from '@mui/icons-material/DoneOutline';
+import TextSmsIcon from '@mui/icons-material/Textsms';
+// @ts-ignore
+import nl2br from 'nl2br';
+
+// third-party
+import {
+  useFilters,
+  useExpanded,
+  useGlobalFilter,
+  useRowSelect,
+  useSortBy,
+  useTable,
+  usePagination,
+  Column,
+  Cell
+} from 'react-table';
+
+// project import
+import CustomerView from 'sections/apps/customer/CustomerView';
+import AddCustomer from 'sections/apps/customer/AddCustomer';
+import Avatar from 'components/@extended/Avatar';
+import IconButton from 'components/@extended/IconButton';
+import MainCard from 'components/MainCard';
+import ScrollX from 'components/ScrollX';
+import { renderFilterTypes } from 'utils/react-table';
+import {
+  HeaderSort,
+  IndeterminateCheckbox,
+  TableRowSelection
+} from 'components/third-party/ReactTable';
+import {
+  PlusOutlined,
+  CloseOutlined,
+} from '@ant-design/icons';
+import { dispatch, RootState } from '../../../store';
+import {
+  changeUsersComment,
+  changeUsersStatus,
+  setAddUsersData,
+  setAuthUserName,
+  setUsersData
+} from '../../../store/reducers/users';
+import {openSnackbar} from '../../../store/reducers/snackbar';
+import StatusWrapper from '../../../components/third-party/statusWrapper/StatusWrapper';
+import { useSelector } from 'react-redux';
+import TypeWrapper from '../../../components/third-party/typeWrapper/TypeWrapper';
+import SearchEmailWrapper from '../../../components/third-party/searchEmailWrapper/SearchEmailWrapper';
+import ConfirmAlertDialog from '../../../sections/apps/alertDialog/ConfirmAlertDialog';
+import { getSelectedType } from '../../../utils/helpers';
+import AddComment from '../../../sections/apps/comment/AddComment';
+import { StatusApi } from '../../../api/statusApi';
+import { AxiosResponse } from 'axios';
+import { TypeApi } from '../../../api/TypeApi';
+import { UserProfileData } from '../../../types/user-profile';
+import { UsersApi } from '../../../api/UsersApi';
+import { affiliateApi } from '../../../api/affiliateApi';
+import {ReactComponent as ShareIcon} from '../../../assets/shareIcon.svg';
+import styles from './list.module.css'
+import {TablePagination} from "../../../components/third-party/react-table/tablePagination/TablePagination";
+import {setCurrentPage, setItemCount, setLastPage} from "../../../store/reducers/pagination";
+import {createBrowserHistory} from "history";
+// import ReactTableCards from "../cards/table/ReactTableCards";
+
+const avatarImage = require.context('assets/images/users', true);
+
+// ==============================|| REACT TABLE ||============================== //
+
+interface Props {
+  columns: Column[] | any;
+  data: [];
+  getHeaderProps: (column: any) => void;
+  handleAdd: () => void;
+  renderRowSubComponent: any;
+  getAffiliateTableValues:(query:string) => void;
+  handlePageChange: (page: number) => void;
+  handleChangePerPage: (
+    evt: SelectChangeEvent<number>,
+    child: ReactNode
+  ) => void;
+}
+
+function ReactTable({ columns, data, getHeaderProps, renderRowSubComponent, handleAdd , getAffiliateTableValues, handlePageChange, handleChangePerPage}: Props) {
+  const theme = useTheme();
+  const matchDownSM = useMediaQuery(theme.breakpoints.down('sm'));
+  const [selectedValue, setSelectedValue] = useState('');
+  const [timeoutId, setTimeoutId] = useState<number | any>(null);
+  const itemCount = useSelector((state: RootState) => state.pagination.itemCount);
+  // const currentPage = useSelector((state: RootState) => state.pagination.currentPage);
+  const lastPage = useSelector((state: RootState) => state.pagination.lastPage);
+
+  const filterTypes = useMemo(() => renderFilterTypes, []);
+  const sortBy = { id: 'fatherName', desc: false };
+
+  const {
+    getTableProps,
+    getTableBodyProps,
+    headerGroups,
+    prepareRow,
+    setHiddenColumns,
+    visibleColumns,
+    // @ts-ignore
+    page,
+    // @ts-ignore
+    gotoPage,
+    // @ts-ignore
+    setPageSize,
+    // @ts-ignore
+    state: { globalFilter, selectedRowIds, pageIndex, pageSize },
+    // @ts-ignore
+    preGlobalFilteredRows,
+    // @ts-ignore
+    setGlobalFilter,
+    // @ts-ignore
+    setSortBy
+  } = useTable(
+    {
+      columns,
+      data,
+      // @ts-ignore
+      filterTypes,
+      // @ts-ignore
+      initialState: { pageIndex: 0, pageSize: 10, hiddenColumns: ['avatar', 'email'], sortBy: [sortBy] }
+    },
+    useGlobalFilter,
+    useFilters,
+    useSortBy,
+    useExpanded,
+    usePagination,
+    useRowSelect
+  );
+
+  useEffect(() => {
+    if (matchDownSM) {
+      setHiddenColumns(['age', 'contact', 'visits', 'email', 'status', 'avatar']);
+    } else {
+      setHiddenColumns(['avatar', 'email']);
+    }
+    // eslint-disable-next-line
+  }, [matchDownSM]);
+
+  useEffect(() => {
+    return () => {
+      clearTimeout(timeoutId);
+    };
+  }, [timeoutId]);
+
+  const handleSelectedStatusSort = async (query: string[]) => {
+    return StatusApi.getSortData(query)
+      .then((res: AxiosResponse) => {
+        const {data} = res.data;
+        dispatch(setUsersData(data))
+      } )
+      .catch( (err) => {
+        console.log('err', err)
+      } )
+      .finally( () => {
+      } );
+  };
+
+  const handleSelectedTypeSort = async (query: string[]) => {
+    return TypeApi.getTypeSortData(query)
+      .then((res: AxiosResponse) => {
+        const {data} = res.data;
+        dispatch(setUsersData(data))
+      } )
+      .catch( (err) => {
+        console.log('err', err)
+      } )
+      .finally( () => {
+      } );
+  };
+
+  const getUsersEmail = async (query?: string) => {
+    return UsersApi.getUsersEmailAll(query)
+      .then((res: AxiosResponse) => {
+        const {data} = res.data;
+        dispatch(setUsersData(data))
+      } )
+      .catch( (err) => {
+        console.log('err', err)
+      } )
+      .finally( () => {
+      } );
+  };
+
+  const handleSelectedStatusChange = async (selectedStatus: string) => {
+    await handleSelectedStatusSort([selectedStatus])
+  };
+
+  const handleSelectedTypesChange = async (selectedType: string) => {
+    await handleSelectedTypeSort([selectedType])
+  };
+
+  const getUsersByEmail = async (newValue: string) => {
+    await getUsersEmail(`?q=${newValue}`);
+  };
+
+  const handleSearchEmailValue = (event: React.ChangeEvent<HTMLInputElement>) => {
+    const newValue = event.target.value;
+    setSelectedValue(newValue);
+    clearTimeout(timeoutId);
+
+    // Set a timeout to send the request after 0.5 seconds of inactivity
+    const newTimeoutId = setTimeout(() => {
+      if (newValue.trim() !== '') {
+        getUsersByEmail(newValue)
+
+      } else {
+        getAffiliateTableValues(`?page=${lastPage}&perPage=${itemCount}`)
+      }
+    }, 500);
+
+    setTimeoutId(newTimeoutId);
+  };
+
+  return (
+    <>
+      <TableRowSelection selected={Object.keys(selectedRowIds).length} />
+      <Stack spacing={3}>
+        <Stack
+          direction={matchDownSM ? 'column' : 'row'}
+          spacing={1}
+          justifyContent="end"
+          alignItems="center"
+          sx={{ p: 3, pb: 0 }}
+        >
+          <Stack direction={matchDownSM ? 'column' : 'row'} alignItems="center" spacing={1}>
+            <TypeWrapper
+              dataType={data}
+              onSelectedTypesChange={handleSelectedTypesChange}
+            />
+            <StatusWrapper
+              statusesAndType={data}
+              onSelectedStatusChange={handleSelectedStatusChange}
+            />
+            <SearchEmailWrapper
+              selectedValue={selectedValue}
+              handleSearchEmailValue={handleSearchEmailValue}
+            />
+            <Button variant="contained" startIcon={<PlusOutlined />} onClick={handleAdd}>
+              Приглашение
+            </Button>
+          </Stack>
+        </Stack>
+
+        <Table {...getTableProps()}>
+          <TableHead>
+            {headerGroups.map((headerGroup) => (
+              <TableRow {...headerGroup.getHeaderGroupProps()} sx={{ '& > th:first-of-type': { width: '58px' } }}>
+                {headerGroup.headers.map((column: any) => (
+                  <TableCell {...column.getHeaderProps([{ className: column.className }, getHeaderProps(column)])}>
+                    <HeaderSort column={column} />
+                  </TableCell>
+                ))}
+              </TableRow>
+            ))}
+          </TableHead>
+          <TableBody {...getTableBodyProps()}>
+            {page.map((row: any, i: number) => {
+              prepareRow(row);
+              const rowProps = row.getRowProps();
+
+              return (
+                <Fragment key={i}>
+                  <TableRow
+                    {...row.getRowProps()}
+                    onClick={() => {
+                      row.toggleRowSelected();
+                    }}
+                    sx={{ cursor: 'pointer', bgcolor: row.isSelected ? alpha(theme.palette.primary.lighter, 0.35) : 'inherit' }}
+                  >
+                    {row.cells.map((cell: any) => (
+                      <TableCell {...cell.getCellProps([{ className: cell.column.className }])}>{cell.render('Cell')}</TableCell>
+                    ))}
+                  </TableRow>
+                  {row.isExpanded && renderRowSubComponent({ row, rowProps, visibleColumns })}
+                </Fragment>
+              );
+            })}
+            <TableRow sx={{ '&:hover': { bgcolor: 'transparent !important' } }}>
+              <TableCell sx={{ p: 2, py: 3 }} colSpan={9}>
+                <TablePagination
+                  gotoPage={handlePageChange}
+                  // rows={rows}
+                  handleChangePerPage={ handleChangePerPage }
+                  setPageSize={setPageSize}
+                  // pageSize={pageSize}
+                  // pageIndex={pageIndex}
+                />
+              </TableCell>
+            </TableRow>
+          </TableBody>
+        </Table>
+      </Stack>
+    </>
+  );
+}
+
+// ==============================|| CUSTOMER - LIST VIEW ||============================== //
+
+const CustomerList = () => {
+  const theme = useTheme();
+  const [customer, setCustomer] = useState(null);
+  const history = createBrowserHistory();
+  const [inviteUserAdded, setInviteUserAdded] = useState<boolean>(false);
+  const [add, setAdd] = useState<boolean>(false);
+  const [openComment, setOpenComment] = useState<boolean>(false);
+  const [showConfirmation, setShowConfirmation] = useState<boolean>(false);
+  const [userComment, setUserComment] = useState<string>('');
+  const [currentUserId, setCurrentUserId] = useState<string>('');
+  const usersData = useSelector((state: RootState) => state.users.usersData);
+  const itemCount = useSelector((state: RootState) => state.pagination.itemCount);
+  const lastPage = useSelector((state: RootState) => state.pagination.lastPage);
+
+
+
+  const handleAdd = () => {
+    setAdd(!add);
+    if (customer && !add) setCustomer(null);
+  };
+
+  const handleAddComment = () => {
+    setOpenComment(!openComment);
+  };
+
+  const handleAddConfirmation = () => {
+    setShowConfirmation(!showConfirmation);
+  };
+
+  const handleAddData = async (data: UserProfileData) => {
+    await handleNewAddedData(data)
+  };
+
+  const handleAddCommentData = async (data: UserProfileData) => {
+    await handleNewAddedComment(data)
+  };
+
+  const handleAddConfirmData = async (userId: string) => {
+    setShowConfirmation(!showConfirmation)
+    await confirmActivation(userId)
+  };
+
+  const confirmActivation = async (userId: any) => {
+    return UsersApi.confirmUserActivation(userId)
+      .then((res: AxiosResponse) => {
+        const {data} = res.data;
+        dispatch(changeUsersStatus(data))
+      } )
+      .catch( (err) => {
+        console.log('err', err)
+      } )
+      .finally( () => {
+      } );
+  };
+
+  const handleNewAddedComment = async (data: UserProfileData) => {
+    return UsersApi.updateUserComment(data)
+      .then((res: AxiosResponse) => {
+        dispatch(changeUsersComment(res.data.data))
+      } )
+      .catch( (err) => {
+        console.log('err', err)
+      } )
+      .finally( () => {
+      } );
+  };
+
+  const handleRejectedActivation = async (userId: string) => {
+    return UsersApi.rejectedActivation(userId)
+      .then((res: AxiosResponse) => {
+        const {data} = res.data;
+        dispatch(changeUsersStatus(data))
+      } )
+      .catch( (err) => {
+        console.log('err', err)
+      } )
+      .finally( () => {
+      } );
+  };
+
+  const handleConfirmActivation = (userId: string) => {
+    setShowConfirmation(!showConfirmation);
+    setCurrentUserId(userId);
+  };
+
+  const handleNewAddedData = async (data: UserProfileData) => {
+    return UsersApi.setInviteUser(data)
+      .then((res: AxiosResponse) => {
+        const {data} = res.data;
+        dispatch(setAddUsersData(data))
+        console.log('XXXXXXXXXXXXXXXXXXX')
+        getAffiliateTableValues(`?page=${lastPage}&perPage=${itemCount}`)
+        setInviteUserAdded(true);
+        dispatch(
+          openSnackbar({
+            open: true,
+            message: 'Отправлено.',
+            variant: 'alert',
+            alert: {
+              color: 'success'
+            },
+            close: false
+          })
+        );
+      } )
+      .catch( (err) => {
+        dispatch(
+          openSnackbar({
+            open: true,
+            message: 'Пользователь с данной почтой уже существует.',
+            variant: 'alert',
+            alert: {
+              color: 'error'
+            },
+            close: false
+          })
+        );
+        console.log('err', err)
+      } )
+      .finally( () => {
+      } );
+  };
+
+  useEffect(() => {
+    (async () => {
+      await getAffiliateTableValues('?perPage=10&page=1');
+    })();
+  }, []);
+
+  useEffect(() => {
+    (async () => {
+      await authUserData();
+    })();
+  }, []);
+
+  const getAffiliateTableValues = (query:string) => {
+    console.log('111111111111111')
+    affiliateApi
+      .getAffiliateOverviewTableValues(query)
+      .then((res) => {
+        const tableData = res.data.data;
+        console.log('res.data.data111', res.data.data)
+        dispatch(setUsersData(tableData))
+
+        const { current_page, per_page, last_page } = res.data.meta;
+        const urlParams = new URLSearchParams( query );
+
+        urlParams.set( 'page', current_page );
+        urlParams.set( 'perPage', per_page );
+
+        let url = `/admin/users/list?${ urlParams.toString() }`;
+
+        history.replace(url);
+        dispatch(setCurrentPage(current_page));
+        dispatch(setLastPage(last_page));
+        dispatch(setItemCount(per_page));
+        history.replace(url);
+      })
+      .catch((err) => {
+        console.log(err); // fixme m
+      });
+  };
+
+  const authUserData = () => {
+    UsersApi
+      .getAuthUserData()
+      .then((res) => {
+        if (res && res.data){
+          dispatch(setAuthUserName(res.data.data.name))
+        }
+      })
+      .catch((err) => {
+        console.log(err); // fixme m
+      });
+  };
+
+  const copyToClipboard = (hash: string) => {
+    navigator.clipboard.writeText(hash)
+      .then(() => {
+        dispatch(
+          openSnackbar({
+            open: true,
+            message: 'Ссылка скопирована',
+            variant: 'alert',
+            alert: {
+              color: 'success'
+            },
+            close: false
+          })
+        );
+      })
+      .catch(err => {
+        console.error('Error copying to clipboard: ', err);
+      });
+  };
+
+  const columns = useMemo(
+    () => [
+      {
+        title: 'Row Selection',
+        Header: ({ getToggleAllPageRowsSelectedProps }: any) => (
+          <IndeterminateCheckbox indeterminate {...getToggleAllPageRowsSelectedProps()} />
+        ),
+        accessor: 'selection',
+        Cell: ({ row }: any) => <IndeterminateCheckbox {...row.getToggleRowSelectedProps()} />,
+        disableSortBy: true
+      },
+      {
+        Header: 'id',
+        accessor: 'id',
+        Cell: ({ row }: any) => {
+          return (
+            <div>
+              <Typography variant="subtitle1" className={styles.userId}
+              >{row.original.id}</Typography>
+            </div>
+          );
+        },
+        className: 'cell-center'
+      },
+      {
+        Header: 'Дата регистрации',
+        accessor: 'fatherName',
+        Cell: ({ row }: any) => {
+          const { values } = row;
+          return (
+
+            <Stack direction="row" spacing={1.5} alignItems="center">
+              <Avatar alt="Avatar 1" size="sm" src={avatarImage(`./avatar-${!values.avatar ? 1 : values.avatar}.png`)} />
+              <Stack spacing={0}>
+                <Typography className={styles.userId} variant="subtitle1">{row.original?.invitation?.updated_at}</Typography>
+              </Stack>
+            </Stack>
+          );
+        }
+      },
+      {
+        Header: 'Email',
+        accessor: 'contact',
+        Cell: ({ row }: Cell<any>) => <div>{row.original.email}</div>
+      },
+      {
+        Header: 'Тип',
+        accessor: 'age',
+        Cell: ({ row }: Cell<any>) => <div>
+          {getSelectedType(row.original.type)}
+        </div>
+      },
+      {
+        Header: 'Комментарий',
+        accessor: 'visits',
+        Cell: ({ row }: Cell<any>) =>
+          <div>
+            <div className={styles.userId} dangerouslySetInnerHTML={{ __html: nl2br(row.original.comment) }} />
+          </div>
+      },
+      {
+        Header: 'Статус',
+        accessor: 'status',
+        Cell: ({ row }: Cell<any>) => {
+          return (
+            <Chip
+              color="error"
+              label={row.original.status}
+              size="small"
+              variant="light"
+              style={{ backgroundColor: '#e6f7ff', color: '#1890ff', borderColor: '#69c0ff', borderRadius: '5px' }}
+            />
+          )
+        }
+      },
+      {
+        Header: 'Действия',
+        className: 'cell-center',
+        disableSortBy: true,
+        Cell: ({ row }: any) => {
+          return (
+            <Stack direction="row" alignItems="center" justifyContent="flex-end" spacing={0}>
+              {row.original.status === 'active' && (
+                <Tooltip title="Comment">
+                  <IconButton
+                    color="primary"
+                    onClick={(e: any) => {
+                      console.log('row.original11', row.original)
+                      e.stopPropagation();
+                      setUserComment(row.original.comment);
+                      setCurrentUserId(row.original.id)
+                      setOpenComment(!openComment)
+                    }}
+                  >
+                    <TextSmsIcon />
+                  </IconButton>
+                </Tooltip>
+              )}
+              {row.original.status === 'pending' && (
+                <>
+                  <Tooltip title="Reject">
+                    <IconButton
+                      color="error"
+                      onClick={(e: any) => {
+                        e.stopPropagation();
+                        handleRejectedActivation(row.original.id)
+                      }}
+                    >
+                      <CloseOutlined twoToneColor={theme.palette.error.main} />
+                    </IconButton>
+                  </Tooltip>
+                  <Tooltip title="Activate">
+                    <IconButton
+                      color="primary"
+                      onClick={(e: any) => {
+                        e.stopPropagation();
+                        handleConfirmActivation(row.original.id)
+                      }}
+                    >
+                      <DoneOutlineIcon
+                        style={{
+                          width:'28px',
+                          height:'28px',
+                          paddingLeft: '5px',
+                          paddingRight: '5px'
+                        }}
+                        className={`${styles.DoneOutlineOutlinedIcon} `}
+                      />
+                    </IconButton>
+                  </Tooltip>
+                  <Tooltip title="Comment">
+                    <IconButton
+                      color="primary" onClick={(e: any) => {
+                      e.stopPropagation();
+                      setOpenComment(!openComment);
+                      setUserComment(row.original.comment);
+                      setCurrentUserId(row.original.id)
+                    }}
+                    >
+                      <TextSmsIcon />
+                    </IconButton>
+                  </Tooltip>
+                </>
+              )}
+              {row.original.status === 'rejected' && (
+                <Tooltip title="Comment">
+                  <IconButton
+                    color="primary"
+                    onClick={(e: any) => {
+                      e.stopPropagation();
+                      setOpenComment(!openComment);
+                      setUserComment(row.original.comment);
+                      setCurrentUserId(row.original.id)
+                    }}
+                  >
+                    <TextSmsIcon />
+                  </IconButton>
+                </Tooltip>
+              )}
+
+              {row.original.status === 'invite_sent' && (
+                <>
+                  <Tooltip title="Share">
+                    <IconButton
+                      color="primary"
+                      onClick={(e: any) => {
+                        e.stopPropagation();
+                        const baseUrl = process.env.REACT_APP_DOLPHIN_CARD_REGISTER_URL;
+                        const hash = row.original.invitation?.hash? row.original.invitation.hash : '';
+                        copyToClipboard(baseUrl + `/auth/register?hash=${ hash }` );
+                      }}
+                    >
+
+                      <ShareIcon />
+                    </IconButton>
+                  </Tooltip>
+                  <Tooltip title="Comment">
+                    <IconButton
+                      color="primary"
+                      onClick={(e: any) => {
+                        e.stopPropagation();
+                        setOpenComment(!openComment);
+                        setUserComment(row.original.comment);
+                        setCurrentUserId(row.original.id)
+                      }}
+                    >
+                      <TextSmsIcon />
+                    </IconButton>
+                  </Tooltip>
+                </>
+              )}
+            </Stack>
+          );
+        }
+      }
+    ],
+    [theme]
+  );
+
+  const renderRowSubComponent = useCallback(({ row }: any) => (
+    <CustomerView data={usersData[row.id]} />
+  ), [usersData]);
+
+  const handlePageChange = async (page: number) => {
+    console.log('TTTTTTTTTTTTTTTT page', page)
+    return getAffiliateTableValues(`?page=${page}&perPage=${itemCount}`);
+  };
+
+  const handleChangePerPage = async (evt: SelectChangeEvent<number>) => {
+    return getAffiliateTableValues(`?page=1&perPage=${evt.target.value}`);
+  };
+
+  return (
+    <MainCard content={false}>
+      <ScrollX>
+        <ReactTable
+          columns={columns}
+          data={usersData}
+          handleAdd={handleAdd}
+          getHeaderProps={(column: any) => column.getSortByToggleProps()}
+          renderRowSubComponent={renderRowSubComponent}
+          getAffiliateTableValues={getAffiliateTableValues}
+          handlePageChange={handlePageChange}
+          handleChangePerPage={handleChangePerPage}
+        />
+        {/*<ReactTableCards*/}
+        {/*  columns={columns}*/}
+        {/*  data={usersData}*/}
+        {/*  handleAdd={handleAdd}*/}
+        {/*  getHeaderProps={(column: any) => column.getSortByToggleProps()}*/}
+        {/*  renderRowSubComponent={renderRowSubComponent}*/}
+        {/*  handlePageChange={handlePageChange}*/}
+        {/*  handleChangePerPage={handleChangePerPage}*/}
+        {/*/>*/}
+      </ScrollX>
+      <Dialog onClose={handleAdd} open={add} >
+        {add && <AddCustomer
+          customer={customer}
+          onCancel={handleAdd}
+          handleAddData={handleAddData}
+          inviteUserAdded={inviteUserAdded}
+        />}
+      </Dialog>
+      <Dialog onClose={handleAddComment} open={openComment} sx={{ '& .MuiDialog-paper': { p: 0 } }}>
+        {openComment && <AddComment
+          customer={customer}
+          onCancel={handleAddComment}
+          handleAddData={handleAddCommentData}
+          userComment={userComment}
+          currentUserId={currentUserId}
+        />}
+      </Dialog>
+      <Dialog onClose={handleAddConfirmation} open={showConfirmation} >
+        {showConfirmation && <ConfirmAlertDialog
+          onCancel={handleAddConfirmation}
+          handleAddData={handleAddConfirmData}
+          currentUserId={currentUserId}
+        />}
+      </Dialog>
+    </MainCard>
+  );
+};
+
+export default CustomerList;

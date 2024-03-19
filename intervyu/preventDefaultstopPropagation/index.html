@@ -1,0 +1,37 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport"
+        content="width=device-width, user-scalable=no, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0">
+  <meta http-equiv="X-UA-Compatible" content="ie=edge">
+  <title>Document</title>
+</head>
+<body>
+<a href="https://www.example.com" id="myLink">Click Me</a>
+
+<div id="parent" style="width: 200px; height: 200px; border: 2px solid red ">
+  <button id="child" style="width: 100px; height: 100px; border: 2px solid red ">Click Me</button>
+</div>
+<script>
+  document.getElementById('myLink').addEventListener('click', function (event) {
+    event.preventDefault(); // Prevent the default behavior of the link
+    alert('Link click event prevented');
+  });
+
+  document.getElementById('parent').addEventListener('click', function () {
+    alert('Parent clicked');
+  });
+
+  document.getElementById('child').addEventListener('click', function (event) {
+    event.stopPropagation(); // Stop the event from propagating to the parent
+    alert('Child clicked');
+  });
+
+  console.log('name', name);
+  var name;
+  name = 1;
+
+</script>
+</body>
+</html>

@@ -1,0 +1,35 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport"
+        content="width=device-width, user-scalable=no, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0">
+  <meta http-equiv="X-UA-Compatible" content="ie=edge">
+  <title>Document</title>
+</head>
+<body>
+<script>
+  function isPalindrome(str) {
+    // Remove non-alphanumeric characters and convert to lowercase
+    str = str.replace(/[^A-Za-z0-9]/g, '').toLowerCase();
+
+    // Compare characters from the beginning and the end of the string
+    for (let i = 0; i < Math.floor(str.length / 2); i++) {
+      if (str[i] !== str[str.length - 1 - i]) {
+        return false;
+      }
+    }
+
+    return true;
+  }
+
+  // Example usage:
+  console.log(isPalindrome("racecar")); // true
+  console.log(isPalindrome("hello"));   // false
+
+
+
+
+</script>
+</body>
+</html>

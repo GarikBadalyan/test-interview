@@ -1,0 +1,59 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport"
+        content="width=device-width, user-scalable=no, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0">
+  <meta http-equiv="X-UA-Compatible" content="ie=edge">
+  <title>Document</title>
+</head>
+<body>
+
+<script>
+// Этот findIndex метод в JavaScript используется для поиска индекса первого элемента массива,
+// удовлетворяющего заданному условию. Он похож на find метод, но возвращает индекс найденного
+// элемента вместо самого элемента. Если соответствующий элемент не найден, возвращается -1. findIndex обычно используется,
+// когда вы хотите найти индекс элемента, который соответствует определенному условию в массиве.
+//   Вот некоторые распространенные случаи использования этого findIndex метода:
+
+// Поиск индекса объекта с определенным значением свойства: можно использовать findIndexдля поиска
+// индекса объекта в массиве объектов на основе определенного значения свойства.
+const users = [
+  { id: 1, username: 'alice' },
+  { id: 2, username: 'bob' },
+  { id: 3, username: 'charlie' },
+];
+
+const index = users.findIndex((user) => user.id === 2);
+console.log('index23', index)
+// index will be 1 (the index of the object with id: 2)
+////////////////////////
+// Метод findIndex() в JavaScript аналогичен методу find(), но он возвращает индекс первого элемента
+// в массиве, который удовлетворяет заданному условию, вместо самого значения. Если элемент не найден,
+// метод возвращает -1.
+
+// Поиск индекса элемента по значению:
+//   findIndex может использоваться для поиска индекса определенного элемента в массиве по его значению.
+const numbers = [1, 2, 3, 4, 5, 6];
+const targetNumber = 3;
+const index2 = numbers.findIndex( (number) => number === targetNumber )
+console.log('index2', index2)
+////////////////////////
+// Поиск объектов по нескольким критериям: можно использовать findIndexдля
+// поиска индекса объектов, отвечающих нескольким условиям.
+const products = [
+  { name: 'Apple', price: 1.0, category: 'Fruit' },
+  { name: 'Banana', price: 0.5, category: 'Fruit' },
+  { name: 'Laptop', price: 999.99, category: 'Electronics' },
+];
+
+const index4 = products.findIndex((product) => product.category === 'Fruit' && product.price <= 1.0);
+// index will be 1 (the index of the 'Banana' object)
+console.log('index33', index4)
+
+// indexOf()используется для поиска индекса определенного элемента, а также findIndex()для поиска индекса
+// первого элемента, который удовлетворяет заданному условию.
+</script>
+</body>
+
+</html>

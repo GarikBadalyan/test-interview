@@ -1,0 +1,71 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport"
+        content="width=device-width, user-scalable=no, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0">
+  <meta http-equiv="X-UA-Compatible" content="ie=edge">
+  <title>Document</title>
+</head>
+<body>
+
+<script>
+  // forEach(): Используется, когда нужно выполнить операции над каждым элементом массива,
+  //   но не требуется создание нового массива.
+
+  // forEach в основном используется для перебора элементов массива и выполнения действий для каждого элемента
+  // Суммирование элементов массива. Вы можете использовать его forEach для вычисления суммы всех элементов массива.
+let arr = [2,4,6,8,10]
+let sum = 0
+arr.forEach( (el) => {
+  sum = sum + el
+} )
+  console.log('sum', sum);
+
+////////////////////////////////
+//   Фильтрация элементов по условию: можно использовать forEach для фильтрации элементов,
+//     соответствующих определенному условию.
+
+  let arr2 = [2,5,33,6,14,54,34,33,57,88,89]
+  let arr3 = []
+
+  arr2.forEach( (el) => {
+    if (el % 2 === 0){
+      arr3.push(el)
+    }
+  } )
+  console.log('arr33-3', arr3)
+  ////////////////////////
+  const products = [
+    { name: 'Apple', price: 1.0 },
+    { name: 'Banana', price: 0.5 },
+    { name: 'Cherry', price: 2.0 },
+    { name: 'Cherry2', price: 2.5 },
+    { name: 'Cherry2', price: 3.0 },
+    { name: 'Cherry2', price: 3.5 },
+  ];
+
+  products.forEach( (el) => {
+    if (el.name === 'Cherry2') {
+      el.price = 10
+    }
+  })
+  console.log('products555', products)
+  ///////////////////////
+  // Обновление свойств в массиве объектов. Если у вас есть массив объектов
+  // и вам необходимо обновить определенное свойство, вы можете forEach это сделать.
+
+  let masivObj = [
+    {name: 'Gar', age: 32},
+    {name: 'Nar', age: 22},
+    {name: 'Armen', age: 12}
+  ]
+
+  masivObj.forEach( (el) => {
+    el.age = el.age + 5
+  } )
+
+  console.log('masivObj22', masivObj)
+</script>
+</body>
+</html>

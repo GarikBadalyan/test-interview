@@ -1,0 +1,265 @@
+/* Base */
+
+body,
+body *:not(html):not(style):not(br):not(tr):not(code) {
+    box-sizing: border-box;
+    font-family: PT Root UI, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif,
+    'Apple Color Emoji', 'Segoe UI Emoji', 'Segoe UI Symbol';
+    position: relative;
+}
+
+body {
+    -webkit-text-size-adjust: none;
+    background-color: #ffffff;
+    color: #718096;
+    height: 100%;
+    line-height: 1.4;
+    padding: 0;
+    width: 100% !important;
+}
+
+.wrapper {
+    -premailer-cellpadding: 0;
+    -premailer-cellspacing: 0;
+    -premailer-width: 100%;
+    background-color: #edf2f7;
+    margin: 0;
+    padding: 0;
+    width: 100%!important;
+}
+
+.body {
+    -premailer-cellpadding: 0;
+    -premailer-cellspacing: 0;
+    -premailer-width: 100%;
+    background-color: #FFFFFF;
+    border-bottom: 1px solid #FFF;
+    border-top: 1px solid #FFF;
+    margin: 0;
+    padding: 0;
+    width: 100%;
+}
+
+.inner-body {
+    -premailer-cellpadding: 0;
+    -premailer-cellspacing: 0;
+    -premailer-width: 600px;
+    background-color: #F9F6FE;
+    border-color: #e8e5ef;
+    border-radius: 24px;
+    border-width: 1px;
+    box-shadow: 0 2px 0 rgba(0, 0, 150, 0.025), 2px 4px 0 rgba(0, 0, 150, 0.015);
+    margin: 0 auto;
+    padding: 0;
+    width: 600px;
+}
+
+.all-rights-reserved-footer {
+    padding-top: 20px;
+}
+
+.all-rights-reserved {
+    color: #B7AACE;
+    text-align: center;
+    font-family: PT Root UI;
+    font-size: 12px;
+    font-style: normal;
+    font-weight: 400;
+    line-height: 140%;
+}
+
+.content-cell {
+    max-width: 100vw;
+    padding: 32px 32px 10px 32px;
+}
+
+.shield-img{
+    padding-top: 63px;
+}
+
+.confirm-your-email {
+    color: #333;
+    text-align: center;
+    font-family: PT Root UI;
+    font-size: 28px;
+    font-style: normal;
+    font-weight: 500;
+    line-height: normal;
+    padding-top: 5px;
+    margin-bottom: 15px;
+}
+
+.activation-link,
+.activation-link-block,
+.registration-information,
+.registration-information-block {
+    font-family: PT Root UI;
+    color: #333;
+    text-align: center;
+    font-size: 16px;
+    font-style: normal;
+    font-weight: 400;
+    line-height: 150%;
+}
+
+.registration-information {
+    display: block;
+    margin: 0;
+    padding-top: -10px;
+}
+
+.Confirm-email-content {
+    display: block;
+    width: 208px;
+    margin: 5px auto;
+    background: #B645EE;
+    border-radius: 8px;
+    text-decoration: none;
+    cursor: pointer;
+    height: 48px;
+    color: #FFFFFF;
+    font-family: PT Root UI;
+    font-size: 16px;
+    font-style: normal;
+    font-weight: 600;
+    line-height: 48px;
+}
+
+.Confirm-email-button {
+    text-align: center;
+    padding-top: 16px
+}
+
+.activation-link {
+    display: block;
+    margin-top: 36px;
+}
+
+.validity-link {
+    display: block;
+    margin-top: 12px;
+    color: #948D9A;
+    text-align: center;
+    font-family: PT Root UI;
+    font-size: 16px;
+    font-style: normal;
+    font-weight: 400;
+    line-height: 140%;
+}
+
+.ignoring-letter-block {
+    font-family: PT Root UI;
+    color: #948D9A;
+    text-align: center;
+    font-size: 16px;
+    font-style: normal;
+    font-weight: 400;
+    line-height: 140%;
+}
+
+.ignoring-letter {
+    display: block;
+    color: #948D9A;
+    margin-top: 16px;
+    text-align: center;
+    font-family: PT Root UI;
+    font-size: 16px;
+    font-style: normal;
+    font-weight: 400;
+    line-height: 140%;
+}
+
+.names-operating-systems {
+    color: #B645EE;
+    /*text-align: center;*/
+    font-family: PT Root UI;
+    font-size: 14px;
+    font-style: normal;
+    font-weight: 700;
+    line-height: 140%;
+    padding-left: 4px;
+    text-decoration: none;
+}
+
+.email-footer {
+    border-top: 1px solid #E4D7F9;
+    margin-top: 25px;
+    padding-top: 25px;
+}
+
+.footer-subscribe-block {
+    width: 100%;
+    text-align: center;
+}
+
+.footer-subscribe {
+    display: block;
+    margin: 0 auto;
+    color: #333;
+    font-family: PT Root UI;
+    font-size: 16px;
+    font-style: normal;
+    font-weight: 400;
+    line-height: 140%
+}
+
+.subscribe-icons-block {
+    width: 160px;
+    text-align: center;
+    padding-left: 30px
+}
+
+/*.browser-download-icons-block {*/
+/*    display: flex;*/
+/*    justify-content: space-around;*/
+/*    width: 264px;*/
+/*}*/
+
+.browser-download-icons-block {
+    display: flex;
+    justify-content: space-around;
+    align-items: center;
+    /*width: 264px;*/
+    padding-right: 15px;
+    padding-left: 15px;
+}
+
+/*.operating-system-windows {*/
+/*    display: flex;*/
+/*    justify-content: center;*/
+/*    align-items: center;*/
+/*    width: 107px;*/
+/*    height: 30px;*/
+/*    border-radius: 30px;*/
+/*    background: #F0DAFC;*/
+/*}*/
+
+.operating-system-windows {
+    /*display: flex;*/
+    /*justify-content: center;*/
+    /*align-items: center;*/
+    width: 107px;
+    height: 30px;
+    border-radius: 30px;
+    background: #F0DAFC;
+}
+
+.operating-system-mac {
+    width: 70px;
+    height: 30px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    border-radius: 30px;
+    background: #F0DAFC;
+}
+
+.operating-system-linux {
+    width: 79px;
+    height: 30px;
+    /*display: flex;*/
+    /*justify-content: center;*/
+    /*align-items: center;*/
+    border-radius: 30px;
+    background: #F0DAFC;
+}

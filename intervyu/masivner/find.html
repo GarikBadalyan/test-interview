@@ -1,0 +1,54 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport"
+        content="width=device-width, user-scalable=no, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0">
+  <meta http-equiv="X-UA-Compatible" content="ie=edge">
+  <title>Document</title>
+</head>
+<body>
+
+<script>
+  // Этот find метод в JavaScript используется для поиска первого элемента массива, удовлетворяющего заданному условию.
+  // Он перебирает каждый элемент массива возвращает первый элемент, соответствующий указанным критериям,
+  // или undefined если соответствующий
+  // элемент не найден. find обычно используется для задач, в которых вы хотите найти один элемент в массиве
+  // на основе определенного условия. Вот некоторые распространенные случаи использования этого find метода:
+  const users = [
+    {name:'Ara', id: 1},
+    {name:'Karen', id: 2},
+    {name:'Alina', id: 3},
+    {name:'Armen', id: 4},
+  ]
+  let user = users.find( el => el.id === 2 );
+  console.log('user1', user)
+  /////////////////////////////
+  // Поиск элемента по значению:
+  //   findможет использоваться для поиска определенного элемента в массиве по его значению.
+  const arr1 = ['Armen', 'karen', 'Artush', 'Arsh', 'Arm', 'aro', 'Beno']
+  let myName = 'Armen'
+  let newName = arr1.find( (name) => name === myName )
+  console.log('newName2', newName)
+/////////////////////////
+  const numbers = [1, 2, 3, 4, 5, 6];
+  const targetNumber = 3;
+  const number = numbers.find((num) => num === targetNumber);
+  // number will be 3
+/////////////////////////////////
+//   Поиск объектов по нескольким критериям: можно использовать findдля поиска объектов,
+//     соответствующих нескольким условиям.
+  const products = [
+    { name: 'Apple', price: 1.0, category: 'Fruit' },
+    { name: 'Banana', price: 0.5, category: 'Fruit' },
+    { name: 'Laptop', price: 999.99, category: 'Electronics' },
+  ];
+
+  const affordableFruit = products.find((product) => product.category === 'Fruit' && product.price < 1.0);
+  // affordableFruit will be { name: 'Banana', price: 0.5, category: 'Fruit' }
+
+  console.log('affordableFruit', affordableFruit)
+
+</script>
+</body>
+</html>

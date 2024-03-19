@@ -1,0 +1,89 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport"
+        content="width=device-width, user-scalable=no, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0">
+  <meta http-equiv="X-UA-Compatible" content="ie=edge">
+  <title>Document</title>
+</head>
+<body>
+
+<script>
+  // Этот filter метод в JavaScript используется для фильтрации элементов массива на основе заданного условия.
+  //   Он возвращает новый массив, содержащий только те элементы, которые соответствуют указанным критериям.
+  //   filter обычно используется для различных целей, в том числе:
+  //   Фильтрация элементов по условию: можно использовать filter для создания нового массива,
+  //   включающего только элементы, удовлетворяющие определенному условию
+  let arr = [2,5,33,6,14,54,34,33,57,88,89]
+  let arr2 = arr.filter( (el) => {
+    return el % 2 === 0;
+  })
+  // const evenNumbers = numbers.filter((num) => num % 2 === 0);
+  console.log('arr2', arr2)
+
+  // Фильтрация пустых или ложных значений: можно использовать filterдля удаления пустых, нулевых,
+  //   неопределенных или других ложных значений из массива.
+  const values = [0, 1, '', null, 'hello', undefined, false];
+
+  const truthyValues = values.filter(Boolean);
+  console.log('truthyValues', truthyValues)
+  const truthyValues1 = values.filter( (el) => {
+    return Boolean(el)
+  })
+  console.log('truthyValues1', truthyValues1)
+
+  // Фильтрация объектов в массиве на основе свойств объекта: можно использовать filter для выбора объектов из массива,
+  //   имеющих определенные свойства или значения.
+  const products = [
+    { name: 'Apple', price: 1.0 },
+    { name: 'Banana', price: 0.5 },
+    { name: 'Cherry', price: 2.0 },
+    { name: 'Cherry2', price: 2.5 },
+    { name: 'Cherry3', price: 3.0 },
+    { name: 'Cherry4', price: 3.5 },
+  ];
+
+ const products2 = products.filter( (el) => {
+    return el.price > 2.0
+  })
+  console.log('products2', products2)
+
+/////////////////////
+  const affordableProducts = products.filter((product) => product.price <= 1.0);
+
+  // Фильтрация строк на основе соответствия подстроки или шаблону: можно использовать filter для выбора строк,
+  //   соответствующих определенной подстроке или шаблону регулярного выражения.
+
+
+  // В JavaScript этот filter метод используется для создания нового массива со всеми элементами,
+  //   отвечающими определенному условию. Он не изменяет исходный массив, а перебирает каждый элемент
+  //   массива возвращает новый массив,
+  //   содержащий только те элементы, которые удовлетворяют указанному условию.
+  let names = ['Aram', 'Nar', 'kar', 'sam', 'hov', 'aro', 'art', 'herm', 'arm']
+
+  let newMas = names.filter( (el) => {
+    return el = el.includes('o')
+  } )
+  console.log('newMas', newMas) // output ['hov', 'aro']
+
+const newMas1 = newMas.filter( (val) => val.includes('r') )
+  // const newMas1 = names.filter( (name) => name.includes('m') )
+
+  console.log('newMas1', newMas1)
+
+  const words = ['spray', 'elite', 'exuberant', 'destruction', 'present'];
+
+  const result = words.filter((word) => word.length > 6);
+
+  console.log(result);
+
+
+
+
+
+
+
+</script>
+</body>
+</html>

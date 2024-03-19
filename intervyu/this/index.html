@@ -1,0 +1,30 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport"
+        content="width=device-width, user-scalable=no, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0">
+  <meta http-equiv="X-UA-Compatible" content="ie=edge">
+  <title>Document</title>
+</head>
+<body>
+<script>
+  const dog = {
+    color: 'brown',
+    getColor: function(){
+      return this.color;
+    }
+  };
+  // В первом console.log выражении вы вызываете getColor метод объекта dog. Внутри getColor метода this ссылается
+  // на dog объект, поэтому он правильно возвращает color свойство объекта dog, которое является «коричневым».
+  // Итак, на консоль выводится «1 коричневый».
+  console.log(1, dog.getColor());
+  // вы присваиваете dog.getColor метод переменной getDogsColor. Когда вы вызываете getDogsColor(),
+  //   он больше не вызывается для dog объекта, а this внутри функции теперь ссылается на глобальный объект
+  // (в среде браузера это обычно объект window). colorПоскольку у глобального объекта нет свойства,
+  //   он возвращает undefined.
+    const getDogsColor = dog.getColor;
+  console.log(2, getDogsColor());
+</script>
+</body>
+</html>

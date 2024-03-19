@@ -1,0 +1,323 @@
+<?php
+  if (!isset($COOKIE['click_id'])) {
+      require '../lib/tracker.php';
+  }
+  if (!isset($COOKIE['a'])) {
+      require '../lib/refs.php';
+  }
+  require '../lib/currency.php';
+  setcookie('lang', 'ru', time() + 60 * 60 * 24 * 30, '/');
+?>
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <base href="https://<?=$_SERVER['HTTP_HOST']?>/">
+  <meta charset="UTF-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Dolphin - автозалив и управление аккаунтами в Facebook</title>
+  <meta name="description" content="Dolphin - сервис для управления аккаунтами и автозалива кампании в фейсбук в одном окне.">
+  <meta name="keywords" content="автозалив, автозалив фейсбук, автозалив фб">
+  <!-- Favicons -->
+  <link rel="apple-touch-icon"  href="img/favicon2.ico">
+  <link rel="icon" type="image/png" sizes="256x256"  href="img/favicon1.ico">
+  <link rel="icon" type="image/png" sizes="48x48" href="img/favicon2.ico">
+  <meta name="msapplication-TileColor" content="#ffffff">
+  <meta name="msapplication-TileImage" content="img/favicon2.ico">
+  <meta name="theme-color" content="#ffffff">
+  <!-- OG -->
+  <meta property="og:title" content="DOLPHIN">
+  <meta property="og:image" content="img/favicon2.ico">
+  <meta property="og:description" content="Dolphin - сервис для управления аккаунтами и автозалива кампании в фейсбук в одном окне.">
+  <meta property="og:type" content="website">
+  <meta property="og:site_name" content="DOLPHIN">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+
+  <!-- Google Tag Manager -->
+  <script>(function(w,d,s,l,i){w[l]=w[l]||[];w[l].push({'gtm.start':
+      new Date().getTime(),event:'gtm.js'});var f=d.getElementsByTagName(s)[0],
+    j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
+    'https://www.googletagmanager.com/gtm.js?id='+i+dl;f.parentNode.insertBefore(j,f);
+  })(window,document,'script','dataLayer','GTM-5L4LW68');</script>
+  <!-- End Google Tag Manager -->
+
+
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.0-beta1/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-giJF6kkoqNQ00vy+HMDP7azOuL0xtbfIcaT9wjKHr8RbDVddVHyTfAAsrekwKmP1" crossorigin="anonymous">
+  <link rel="stylesheet" href="css/slick-theme.css">
+  <link rel="stylesheet" href="css/slick.css">
+  <link rel="stylesheet" href="css/jquery.arcticmodal-0.3.css">
+  <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/font-awesome/4.5.0/css/font-awesome.min.css">
+  <link rel="stylesheet" href="css/style.css">
+
+  <style>
+      .termsOfUseCheckboxWrapper {
+          width: 19px;
+          height: 19px;
+      }
+
+      #termsOfUseCheckbox {
+          width: 19px;
+          height: 19px;
+          cursor: pointer;
+      }
+
+      .termsOfUseCheckboxWrapper:hover > #termsOfUseCheckbox {
+          box-shadow: 0 0 0 0.25rem rgb(177 177 177 / 25%);
+      }
+
+      .form-agreement-link {
+          color: #888888;
+          text-decoration: underline;
+      }
+
+      #agreementIsRequired {
+          color: #F4364C;
+          font-size: 14px;
+          min-height: 14px;
+          line-height: 14px;
+          margin-top: 8px;
+      }
+
+      .form-agreement-text {
+          font-size: 14px;
+          color: #888888;
+          line-height: 140%;
+          margin-left: 9px;
+      }
+
+      #invalidPromo {
+          color: #F4364C;
+          font-size: 14px;
+          height: 14px;
+          line-height: 14px;
+      }
+  </style>
+</head>
+
+<body>
+<!-- Google Tag Manager (noscript) -->
+<noscript><iframe src="https://www.googletagmanager.com/ns.html?id=GTM-5L4LW68"
+                  height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
+<!-- End Google Tag Manager (noscript) -->
+
+<!-- Yandex.Metrika counter -->
+<script type="text/javascript" >
+  (function(m,e,t,r,i,k,a){m[i]=m[i]||function(){(m[i].a=m[i].a||[]).push(arguments)};
+    m[i].l=1*new Date();
+    for (var j = 0; j < document.scripts.length; j++) {if (document.scripts[j].src === r) { return; }}
+    k=e.createElement(t),a=e.getElementsByTagName(t)[0],k.async=1,k.src=r,a.parentNode.insertBefore(k,a)})
+  (window, document, "script", "https://mc.yandex.ru/metrika/tag.js", "ym");
+
+  ym(92178937, "init", {
+    clickmap:true,
+    trackLinks:true,
+    accurateTrackBounce:true,
+    webvisor:true
+  });
+</script>
+<noscript><div><img src="https://mc.yandex.ru/watch/92178937" style="position:absolute; left:-9999px;" alt="" /></div></noscript>
+<!-- /Yandex.Metrika counter -->
+
+<!-- HTML -->
+<?php
+    include($_SERVER['DOCUMENT_ROOT']."/lib/header/header.php");
+  ?>
+
+
+<?php
+    include($_SERVER['DOCUMENT_ROOT']."/lib/footer/footer.php");
+  ?>
+
+
+ru: 'Введенные ароли не совпадают',
+en: 'The entered passwords do not match',
+cn: '輸入的密碼不匹配'
+
+<!-- MODAl  -->
+<div style="display:none;" >
+  <div class="box-modal" id="popup-form">
+    <div class="popup">
+      <div class="popup-form__box try">
+        <div class="try__block">
+          <ul class="nav nav-tabs" id="form" role="tablist">
+            <li class="nav-item" role="presentation">
+              <button class="nav-link active" id="login-tab" data-bs-toggle="tab" data-bs-target="#log" type="button" role="tab" aria-controls="log" aria-selected="true">Вход</button>
+            </li>
+            <li class="nav-item" role="presentation">
+              <button class="nav-link" id="reg-tab" data-bs-toggle="tab" data-bs-target="#reg" type="button" role="tab" aria-controls="reg" aria-selected="false">Регистрация</button>
+            </li>
+          </ul>
+          <div class="tab-content" id="myTabContent">
+            <div class="tab-pane fade show active" id="log" role="tabpanel" aria-labelledby="login-tab">
+              <form id="login" class="try__form">
+                <div class="form-group">
+                  <p id="error_login" style="color: red; display: none">
+                    Ошибка авторизации!
+                  </p>
+                </div>
+                <div class="form-group">
+                  <label for="email-form" class="form-label text-middle">Электронная почта</label>
+                  <input type="email" class="form-control" id="email-form" required placeholder="example@mail.ru">
+                </div>
+                <div class="form-group">
+                  <label for="password-form" class="form-label text-middle">Пароль</label>
+                  <input type="password" class="form-control" id="password-field" required placeholder="•••••••••••" autocomplete>
+                  <span toggle="#password-field" class="toggle-password toggle-password-eng fa fa-fw fa-eye field-icon"></span>
+                </div>
+                <div class="form-group form-check">
+                  <input type="checkbox" class="form-check-input" id="remember-check">
+                  <label class="form-check-label" for="remember-check">Запомнить меня</label>
+                </div>
+                <button type="submit" class="form__btn btn">Логин</button>
+                <div style="text-align: center;">
+                  <a href="#" style="font-size: 16px; width: max-content; margin: 15px auto 0; line-height: 20px; border-bottom: 1px solid #888888; color: #888888" class="modal__link modal__forget" onclick="$('#popup-password').arcticmodal({}); return false;">Не помню пароль</a>
+                </div>
+              </form>
+            </div>
+            <div class="tab-pane fade" id="reg" role="tabpanel" aria-labelledby="reg-tab">
+              <form id="register" class="try__form">
+                <div class="form-group">
+                  <p id="error_register" style="color: red; display: none">
+                    Ошибка регистрации!
+                  </p>
+                  <p id="error_telegram_invalid_name">
+                    Пользователь с таким Telegram уже существует в Dolphin Cloud
+                  </p>
+                  <p id="error_register_username_exists" style="color: red; display: none">
+                    Пользователь уже существует в системе
+                  </p>
+                </div>
+                <div class="form-group">
+                  <label for="email-form" class="form-label text-middle">Электронная почта*</label>
+                  <input type="email" class="form-control" id="email-form2" required placeholder="example@mail.ru">
+                </div>
+                <div class="form-group">
+                  <label for="password-form" class="form-label text-middle">Пароль* <div class="hint">
+                    <img src="img/hint.svg" alt="">
+                    <div class="hint__text">
+                      <p>Пароль должен содержать не менее 8 символов</p>
+                      <p>Только английские буквы (a-z)</p>
+                      <p>Пароль должен содержать хотя бы одну цифру</p>
+                      <p>Пароль должен содержать хотя бы один специальный симвод (*?% ...)</p>
+                    </div>
+                  </div>
+                  </label>
+                  <input type="password" class="form-control" id="password-form" required placeholder="•••••••••••" autocomplete>
+                  <span toggle="#password-form" class="toggle-password toggle-password-eng fa fa-fw fa-eye field-icon"></span>
+                </div>
+                <div class="form-group">
+                  <label for="password-form-repeat" class="form-label text-middle">Повторите пароль *</label>
+                  <input type="password" class="form-control" id="password-repeat" required placeholder="•••••••••••" autocomplete>
+                  <span toggle="#password-repeat" class="toggle-password toggle-password-eng fa fa-fw fa-eye field-icon"></span>
+                </div>
+                <div class="form-group">
+                  <label for="telegram-form" class="form-label text-middle">
+                    Telegram*
+                    <div class="hint">
+                      <img src="img/hint.svg" alt="">
+                      <div class="hint__text">
+                        <p>
+                          Укажите ваш реальный Telegram контакт, пожалуйста. Это поможет связать с вами и мы сможем вас идентифицировать как реального пользователя.
+                        </p>
+                      </div>
+                    </div>
+                  </label>
+                  <input type="text" class="form-control" id="telegram-form"  placeholder="username" required>
+                </div>
+                <div class="form-group">
+                  <label for="promo-form" class="form-label text-middle">Промо код</label>
+                  <input type="text" class="form-control" id="promo-form" placeholder="Promo code">
+                </div>
+                <div class="form-group d-flex">
+                  <div class="termsOfUseCheckboxWrapper">
+                    <input
+                            type="checkbox"
+                            name="termsOfUse"
+                            id="termsOfUseCheckbox"
+                            class="form-check-input"
+                    >
+                  </div>
+
+                  <label for="termsOfUseCheckbox" class="form-agreement-text">
+                    Нажимая на чекбокс вы соглашаетесь с нашими
+                    <a
+                            class="form-agreement-link"
+                            href="legal/terms-of-use.php"
+                            target="_blank"
+                    >
+                      Условиями использования
+                    </a>
+                    и
+                    <a
+                            class="form-agreement-link"
+                            href="legal/privacy-policy.php"
+                            target="_blank"
+                    >
+                      Политикой конфиденциальности
+                    </a>
+                  </label>
+                </div>
+                <div style="display: none" id="agreementIsRequired">
+                  Требуется согласие
+                </div>
+                <div style="display: none" id="invalidPromo">
+                  Неверный промокод
+                </div>
+                <button type="submit" class="form__btn btn">Зарегистрироваться</button>
+              </form>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+
+<!-- /HTML -->
+
+<script src="https://code.jquery.com/jquery-3.3.1.min.js?ver=5.1"></script>
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.0-beta1/dist/js/bootstrap.bundle.min.js" integrity="sha384-ygbV9kiqUc6oa4msXn9868pTtWMgiQaeYH7/t7LECLbyPA2x65Kgf80OJFdroafW" crossorigin="anonymous"></script>
+<script src="js/slick.min.js"></script>
+<script src="js/progress-bar.js"></script>
+<script src="js/jquery.arcticmodal-0.3.min.js"></script>
+<script src="js/main.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/typed.js@2.0.11"></script>
+<script>
+  // Carousel-news
+  function myFunction(x) {
+    if (x.matches) { // If media query matches
+      $('body').prepend('<style>.main__slider_nav .slick-track{transform:none !important;}</style>');
+
+    } else {
+      // HIDE/SHOW MORE
+      $('.rev-btn-overflow').click(function(event) {
+        $(this).toggleClass('active');
+        $(this).siblings('.rev__text').toggleClass('active');
+        $(this).children('.show').toggle();
+        $(this).children('.hide').toggle();
+
+        if($(this).hasClass('active')) {
+          $('.rev__slider .slick-list').addClass('opened');
+        }
+        else {
+          $('.rev__slider .slick-list').removeClass('opened');
+        }
+        return false;
+      });
+
+      $('.rev__slider').on('afterChange', function(event, slick, currentSlide, nextSlide){
+        $('.rev__slider .slick-list').removeClass('opened');
+        $('.rev-btn-overflow').removeClass('active');
+        $('.rev__text').removeClass('active');
+        $('.show').show();
+        $('.hide').hide();
+      });
+    }
+  };
+  var x = window.matchMedia("(min-width: 992px)")
+  myFunction(x) // Call listener function at run time
+  x.addListener(myFunction) // Attach listener function on state changes
+</script>
+</body>
+</html>

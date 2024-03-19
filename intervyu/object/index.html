@@ -1,0 +1,36 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport"
+        content="width=device-width, user-scalable=no, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0">
+  <meta http-equiv="X-UA-Compatible" content="ie=edge">
+  <title>Document</title>
+</head>
+<body>
+
+
+<script>
+  // Условие Object.prototype.hasOwnProperty.call(this.cabsOptions, id)проверяет, является ли свойство с именем
+  // idпрямым свойством объекта this.cabsOptions. Это способ гарантировать, что цикл выполняет итерацию по
+  // фактическим свойствам, this.cabsOptionsа не по свойствам, унаследованным от цепочки прототипов.
+  //
+  //   В JavaScript объекты имеют цепочку прототипов, и свойства могут быть унаследованы от их прототипов.
+  //   Метод hasOwnPropertyиспользуется для проверки наличия определенного свойства непосредственно в объекте,
+  //   а не где-то в цепочке его прототипов.
+  //
+  //   Итак, в контексте вашего кода:
+
+  for (const id in this.cabsOptions) {
+    if (Object.prototype.hasOwnProperty.call(this.cabsOptions, id)) {
+      // The code inside this block will only execute if 'id' is a direct property of 'this.cabsOptions'
+      // and not inherited from its prototype chain.
+      const value = this.cabsOptions[id];
+    }
+  }
+  // Это гарантирует, что вы обрабатываете только фактические свойства, this.cabsOptionsа не свойства,
+  //   которые могут быть унаследованы от его прототипа. Это хорошая практика при переборе свойств объекта в
+  // JavaScript.
+</script>
+</body>
+</html>

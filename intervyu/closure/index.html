@@ -1,0 +1,69 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport"
+        content="width=device-width, user-scalable=no, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0">
+  <meta http-equiv="X-UA-Compatible" content="ie=edge">
+  <title>Document</title>
+</head>
+<body>
+
+<script>
+  // В JavaScript замыкания — это фундаментальная концепция, связанная с тем, как работают функции и их лексическое
+  // окружение. Замыкание создается, когда функция определена внутри другой функции и имеет доступ к
+  // переменным внешней функции даже после завершения выполнения внешней функции. Замыкания позволяют
+  // сохранять состояние и создавать частные переменные в JavaScript.
+  //   Вот пример, иллюстрирующий замыкания:
+
+  function outerFunction() {
+    let outerVariable1 = "I am from the outer function";
+    function innerFunction33() {
+      console.log('outerVariable',  outerVariable1); // innerFunction has access to outerVariable
+    }
+    return innerFunction33;
+  }
+
+  const closure = outerFunction();
+  closure();
+//////////////////////////////
+  function outerFunction1() {
+    let outerVariable = 10;
+    function innerFunction55() {
+      outerVariable++
+      console.log(outerVariable); // innerFunction has access to outerVariable
+    }
+    return innerFunction55;
+  }
+
+  const closure1 = outerFunction1();
+  closure1();
+  closure1();
+  closure1();
+  closure1();
+///////////////////////////////
+
+  function outerFunction2() {
+    let outerVariable = 10;
+    function innerFunction4(tiv) {
+      outerVariable += tiv
+      console.log(outerVariable); // innerFunction has access to outerVariable
+    }
+    return innerFunction4;
+  }
+
+  const closure2 = outerFunction2();
+  closure2(5);
+  closure2(4);
+  closure2(1);
+  closure2(20);
+
+  // const target = { a: 1, b: 2 };
+  // const source = { b: 4, c: 5 };
+
+  // const returnedTarget = Object.assign(target, source);
+  // typeof null == typeof window?
+
+</script>
+</body>
+</html>

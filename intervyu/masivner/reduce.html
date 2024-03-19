@@ -1,0 +1,91 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport"
+        content="width=device-width, user-scalable=no, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0">
+  <meta http-equiv="X-UA-Compatible" content="ie=edge">
+  <title>Document</title>
+</head>
+<body>
+
+<script>
+  // Метод reduce() в JavaScript применяется к массивам и позволяет свести массив к единственному значению.
+  // Он выполняет функцию обратного вызова для каждого элемента массива, накапливая результат
+  // в одно единственное значение. Это значение может быть числом, строкой, объектом или любым другим типом данных.
+
+  let arr = [
+    {name: 'Narek'},
+    {age: 34},
+    {phone: '3444545456'},
+  ]
+
+  const result = arr.reduce( (accumulator, val) => {
+    if (val.name !== undefined){
+      accumulator.name = val.name
+    }
+    if (val.age !== undefined){
+      accumulator.age = val.age
+    }
+    if (val.phone !== undefined){
+      accumulator.phone = val.phone
+    }
+    return accumulator
+  }, {} )
+  console.log('result1', result)
+
+  let arr2 = [3, 5, 7, 10, 12 ]
+  let res1 = arr2.reduce( (accumulator, val) => {
+    return accumulator + val
+  }, 0)
+  console.log('res1', res1)
+  // Вычисление произведения элементов:
+  //   reduce может использоваться для нахождения произведения всех элементов массива.
+  const numbers = [2, 3, 4, 5];
+  const product = numbers.reduce((accumulator, currentValue) => accumulator * currentValue, 1);
+  // product will be 120 (2 * 3 * 4 * 5)
+  console.log('product', product)
+
+  const words = ['Hello', ' ', 'World', '!'];
+ let newWord = words.reduce( (accumulator, val) => {
+    return accumulator + val
+  }, '' )
+  console.log('newWord', newWord)
+
+  const words1 = ['Hello', ' ', 'World', '!'];
+  const sentence = words1.reduce((accumulator, currentValue) => accumulator + currentValue, '');
+  // sentence will be 'Hello World!'
+  console.log('sentence', sentence)
+
+  // Преобразование данных в другой формат: вы можете использовать его reduce для преобразования данных в
+  // другую структуру, например преобразование массива объектов в объект с парами ключ-значение.
+  const data = [
+    { id: 'a', value: 1 },
+    { id: 'b', value: 2 },
+    { id: 'c', value: 3 },
+    { id: 'd', value: 4 },
+  ];
+  data.forEach( (elem) => {
+    console.log('[elem.id]11111', [elem.id])
+  } )
+
+  // console.log('data[id]', data[id])
+
+  let newData = data.reduce( (accumulator, elem) => {
+    accumulator[elem.id] = elem.value
+    // console.log('AAAAAAAAAAA  accumulator[elem.id] ',  accumulator[elem.id] )
+    console.log('accumulator-----', accumulator)
+    return accumulator
+  }, {})
+  console.log('newData', newData)
+
+  let obj = {
+    name: 'kkk',
+    age: 23,
+    lastName: 'cjnvkjnk'
+  }
+  console.log('obg[age]', obj['age'])
+
+</script>
+</body>
+</html>

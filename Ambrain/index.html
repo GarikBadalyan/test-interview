@@ -1,0 +1,112 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <style>
+      body {
+          margin: 0;
+          font-family: 'Arial', sans-serif;
+          background: black;
+      }
+      .header {
+          display: flex;
+          justify-content: space-between;
+          align-items: center;
+          background-color: #454750;
+          color: #fff;
+          padding: 10px 70px;
+          height: 80px;
+      }
+      .header nav {
+          display: flex;
+      }
+      .header nav a {
+          color: #F6FFF8;
+          text-decoration: none;
+          margin-left: 20px;
+          font-size: 16px;
+          font-weight: 400;
+          line-height: 19px;
+          text-align: center;
+
+      }
+      .header nav a:hover {
+          /*text-decoration: underline;*/
+      }
+
+      .content {
+          display: flex;
+          justify-content: space-between;
+          align-items: center;
+          padding: 20px;
+          max-width: 1200px; /* Adjust this value as needed */
+          margin: 0 auto;
+      }
+      .content-text {
+          flex: 1;
+          padding-right: 20px;
+          color: #FFFFFF;
+      }
+      .content-image {
+          flex: 1;
+      }
+      .content-image img {
+          width: 100%;
+          height: auto;
+      }
+
+      @media (max-width: 768px) {
+          .content {
+              flex-direction: column;
+          }
+          .content-text,
+          .content-image {
+              padding: 0;
+          }
+          .content-image img {
+              max-width: 80%;
+              margin: 20px auto;
+          }
+      }
+
+      @media (max-width: 600px) {
+          .header nav {
+              display: none;
+          }
+      }
+
+
+  </style>
+</head>
+<body>
+
+<div class="header">
+<!--  <div class="logo">AmBrain</div>-->
+  <div class="logo">
+    <img src="ambrain.svg" alt="dwefwef">
+
+  </div>
+  <nav>
+    <a href="/services">Services</a>
+    <a href="/portfolio">Portfolio</a>
+    <a href="/team">Team</a>
+    <a href="/job">Job</a>
+    <a href="/about">About Us</a>
+    <a href="/contact">Contact us</a>
+  </nav>
+</div>
+
+<div class="content">
+  <div class="content-text">
+    <h1>SOFTWARE </h1>
+    <h1>COMPANY</h1>
+    <p>Bring your digital ideas to life with AmBrain – your partner in crafting modern websites for high-tech companies. Get expert advice from our developer team. Let's work together.</p>
+  </div>
+  <div class="content-image">
+    <img src="shutterstock.png" alt="Software Development">
+  </div>
+</div>
+
+</body>
+</html>

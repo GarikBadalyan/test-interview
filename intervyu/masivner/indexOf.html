@@ -1,0 +1,68 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport"
+        content="width=device-width, user-scalable=no, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0">
+  <meta http-equiv="X-UA-Compatible" content="ie=edge">
+  <title>Document</title>
+</head>
+<body>
+
+
+<script>
+  // Метод indexOf() возвращает первый индекс, по которому данный элемент может быть найден в массиве или -1,
+  //   если такого индекса нет.
+
+  // Этот indexOf()метод в JavaScript используется для поиска указанного элемента в массиве и возвращает
+  // индекс первого вхождения элемента. Если элемент не найден, возвращается -1.
+  var array = [2, 5, 9];
+  array.indexOf(2); // 0
+  array.indexOf(7); // -1
+  array.indexOf(9, 2); // 2
+  array.indexOf(2, -1); // -1
+  array.indexOf(2, -3); // 0
+
+  let fruits = ["apple", "banana", "orange", "banana", "grape"];
+  console.log(fruits.indexOf("banana")); // Output: 1
+  console.log(fruits.indexOf("banana", 2)); // Output: 3
+  console.log(fruits.indexOf("pear")); // Output: -1
+  let str = "Hello, world!";
+  console.log(str.indexOf("o")); // Output: 4
+  console.log(str.indexOf("o", 5)); // Output: 8
+  console.log(str.indexOf("z")); // Output: -1
+
+  let indices = [];
+  let array1 = ["a", "b", "a", "c", "a", "d"];
+  let element = "a";
+  let idx = array1.indexOf(element);
+  while (idx != -1) {
+    indices.push(idx);
+    idx = array1.indexOf(element, idx + 1);
+  }
+
+  console.log('indices', indices);
+////////////////////
+  let array2 = [1, 2, 3, 4, 5];
+
+  console.log('array2.indexOf(3)', array2.indexOf(3)); // Output: 2 (index of value 3)
+  console.log('array2.indexOf(6)', array2.indexOf(6)); // Output: -1 (value 6 is not in the array)
+  console.log('array2.indexOf(4, 2)', array2.indexOf(4, 2)); // Output: 3 (starting from index 2, index of value 4)
+  ////////////////////////
+
+  let string = "Hello, world!";
+
+  console.log('string.indexOf(\'o\')', string.indexOf('o')); // Output: 4 (index of first 'o' occurrence)
+  console.log('string.indexOf(\'l\', 4)', string.indexOf('l', 4)); // Output: 2 (starting from index 4, index of first 'l' occurrence)
+  console.log('string.indexOf(\'x\')', string.indexOf('x')); // Output: -1 (value 'x' is not in the string)
+
+
+  const array4 = [2, 5, 9, 2];
+
+  console.log('arr4', array4.indexOf(2));      // Output: 0 (first occurrence of 2)
+
+  // indexOf()используется для поиска индекса определенного элемента, а также findIndex()для поиска индекса
+  // первого элемента, который удовлетворяет заданному условию.
+</script>
+</body>
+</html>

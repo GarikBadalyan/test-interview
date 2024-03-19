@@ -1,0 +1,109 @@
+<!doctype html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport"
+          content="width=device-width, user-scalable=no, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>Document</title>
+    <style>
+        .sidebar {
+            width: 250px;
+            height: 100%;
+            background-color: #333;
+            position: fixed;
+        }
+
+        .sidebar ul {
+            list-style: none;
+            padding: 0;
+        }
+
+        .sidebar li {
+            padding: 10px;
+        }
+
+        .sidebar a {
+            text-decoration: none;
+            color: #fff;
+            display: block;
+        }
+
+        .content {
+            margin-left: 250px;
+            padding: 20px;
+
+        }
+
+    </style>
+</head>
+<body>
+<div class="sidebar">
+    <ul>
+        <li><a href="#">Главная</a></li>
+        <li><a href="#">О нас</a></li>
+        <li><a href="#">Услуги</a></li>
+        <li><a href="#">Контакты</a></li>
+    </ul>
+</div>
+
+<div class="content">
+    <!-- Содержимое страницы -->
+</div>
+
+
+
+<script>
+  //     let arr = [2,5,33,6,14,54,34,33,57,88,89]
+  //
+  // let el = arr.filter(item => item % 2 === 0)
+  //     console.log('el', el)
+
+  const products = [
+    {name: 'Apple', price: 1.0},
+    {name: 'Banana', price: 0.5},
+    {name: 'Cherry', price: 2.0},
+    {name: 'Cherry2', price: 2.5},
+    {name: 'Cherry3', price: 3.0},
+    {name: 'Cherry4', price: 3.5},
+  ];
+
+  let el1 = products.filter(item => item.price > 2)
+  console.log('el1', el1)
+
+  function eee() {
+    return products.filter((el) => {
+      return el.price > 0.5
+    })
+  }
+
+  let filteredProducts = eee()
+  console.log('el3', filteredProducts)
+
+
+  document.addEventListener("click", function (event) {
+    // Check if the middle mouse button was clicked
+    console.log('event', event)
+    if (event.button === 1) {
+      console.log("Middle mouse button clicked! -21111");
+    }
+  });
+
+
+  <v-list-item
+    v-show="profile.isTeamOwner"
+  >
+    <v-list-item-icon>
+      <v-icon>
+        fa-sharp fa-solid fa-code
+      </v-icon>
+    </v-list-item-icon>
+    <v-list-item-title>
+      API
+    </v-list-item-title>
+  </v-list-item>
+
+
+</script>
+</body>
+</html>

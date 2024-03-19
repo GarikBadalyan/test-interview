@@ -1,0 +1,767 @@
+import React, { CSSProperties, useEffect, useRef, useState } from 'react';
+import { useSelector } from 'react-redux';
+import { useSearchParams } from 'react-router-dom';
+import { FormattedMessage, useIntl } from 'react-intl';
+import { toast } from 'react-toastify';
+import { AxiosResponse } from 'axios';
+import { DragDropContext, Draggable, Droppable, DropResult, } from 'react-beautiful-dnd';
+import { Box, ClickAwayListener, Grid, Grow, Paper, Popper, Tab, Tabs } from '@mui/material';
+import Tooltip from '@mui/material/Tooltip';
+import { PlusOutlined } from '@ant-design/icons';
+import { dispatch, RootState } from '../../store';
+import { editSelectedFolder, resetSelectedFolder, setSelectedFolder } from '../../store/reducers/brovisorFolder';
+import { echo } from '../../App';
+import CreateOrUpdateBrovisorFolder from './createOrUpdateBrovisorFolder/CreateOrUpdateBrovisorFolder';
+import BrovisorFolderDropdown from './brovisorFolderDropdown/BrovisorFolderDropdown';
+import { createPlaceholder } from '../../utils/createPlaceholder';
+import { logoutWithUnexpectedToken } from '../../utils/auth';
+import { findFolder, getDefaultActiveTab, getFolderUniqueName, getTabsListWithStorage } from '../../utils/brovisorFolders';
+import { BrovisorFolders, BrovisorFolderTypes, deletedSocketFolders } from '../../types/brovisorFolder';
+import { TabListTypes } from '../../types/overrides/tabs';
+import crossError from '../../assets/icons/helperIcons/crossError.svg';
+import BrovisorFolderApi from '../../api/FolderApi';
+import styles from './brovisorFolder.module.css';
+
+const activeTabStyles: CSSProperties = {
+// position: 'sticky',
+// zIndex: 999,
+// left: 0
+};
+
+interface BrovisorFolderProps {
+handelFolderChange: ( folder?: BrovisorFolderTypes | null, ) => void;
+}
+
+function BrovisorFolder( {handelFolderChange}: BrovisorFolderProps ) {
+const intl = useIntl();
+const [ searchParams ] = useSearchParams();
+const folderDialogRef = useRef() as React.RefObject<HTMLDivElement>;
+    const createFolderRef = useRef() as React.RefObject<HTMLDivElement>;
+
+        const selectedFolder = useSelector(
+        ( state: RootState ) => state.brovisorFolder.selectedFolder
+        );
+
+        const [ activeTabIndex, setActiveTabIndex ] = useState<number>( 0 );
+            const [ tabsList, setTabsList ] = useState<TabListTypes[]>( [] );
+            const [ folders, setFolders ] = useState<BrovisorFolderTypes[]>( [] );
+            const [ userParamsInTeam, setUserParamsInTeam ] = useState<string | null>();
+                const [ folderNameValidationMessage, setFolderNameValidationMessage ] = useState<string>( "" );
+                    const [ showCreateOrUpdateDialog, setShowCreateOrUpdateDialog ] = useState<boolean>( false );
+                        const [ folderItemRef, setFolderItemRef ] = useState<React.RefObject<HTMLDivElement>>( createFolderRef );
+                            const [ showFolderDialog, setShowFolderDialog ] = useState<boolean>(false);
+                                const [ localStorageStringefy, setLocalsStorage ] = useState<string>('');
+
+                                    const [ lastTabRef, setLastTabRef ] = useState<HTMLDivElement | null>( null );
+
+                                        useEffect(() => {
+                                        (async () => {
+                                        await getFolders();
+
+                                        setUserParamsInTeam(localStorage.getItem('userParamsInTeam'));
+                                        })();
+                                        }, [localStorageStringefy]);
+
+                                        useEffect(() => {
+                                        const channel = echo.private('folder');
+
+                                        channel.listen('.delete.folder', succesDeleteFolderHandler);
+                                        channel.listen('.failed.delete.folder', failedFolderHanlder);
+
+                                        return () => {
+                                        channel.stopListening('.delete.folder');
+                                        channel.stopListening('.failed.delete.folder');
+                                        };
+                                        }, [folders]);
+
+                                        const failedFolderHanlder = () => {
+                                        toast.error(<FormattedMessage id="request-error-message" />, {
+                                        icon: <img src={crossError} alt={crossError} />,
+                                        });
+                                        };
+
+                                        const succesDeleteFolderHandler = (data:deletedSocketFolders) => {
+                                        const id = data.ids[0];
+
+                                        if(id) {
+                                        const updatedFolders = [ ...folders ];
+                                        const foundActiveFolder = updatedFolders[activeTabIndex]?.id;
+                                        const foundIndex = updatedFolders.findIndex( ( el ) => el.id === id );
+                                        const storageFolders = localStorage.getItem( 'brovisorFolders' );
+
+                                        if ( foundIndex !== -1 ) {
+                                        updatedFolders.splice( foundIndex, 1 );
+                                        setTabsList( getTabsListWithStorage( updatedFolders ) );
+                                        setFolders( updatedFolders );
+                                        }
+
+                                        if ( storageFolders ) {
+                                        const draggabledFolders = JSON.parse( storageFolders );
+                                        const foundLocalIndex = draggabledFolders.findIndex( ( el: TabListTypes ) => el.uuid === id );
+
+                                        if ( foundLocalIndex !== -1 ) {
+                                        draggabledFolders.splice( foundLocalIndex, 1 );
+                                        console.log('.setItem broviso 22')
+                                        localStorage.setItem( 'brovisorFolders', JSON.stringify( draggabledFolders ) );
+                                        setTabsList( getTabsListWithStorage(draggabledFolders) );
+                                        }
+                                        }
+
+                                        if ( foundIndex === activeTabIndex - 1 ) {
+                                        setActiveTabIndex( 0 );
+                                        handelFolderChange( null );
+                                        } else {
+                                        const foundActiveFolderIndex = updatedFolders.findIndex( ( el ) => el.id === foundActiveFolder );
+
+                                        if ( foundActiveFolderIndex === -1 || foundActiveFolderIndex === 0 ) {
+                                        setActiveTabIndex( 0 );
+                                        handelFolderChange( null );
+                                        } else {
+                                        setActiveTabIndex( foundActiveFolderIndex );
+                                        handelFolderChange( updatedFolders[foundActiveFolderIndex] );
+                                        }
+                                        }
+
+                                        setShowCreateOrUpdateDialog( false );
+                                        toast.success( <FormattedMessage id="folder-success-deleted"/>, {
+                                        icon: <img src={ crossError } alt={ crossError }/>,
+                                        } );
+                                        }
+                                        };
+
+                                        useEffect(() => {
+                                        (async () => {
+                                        async function handleKeyDown(event: KeyboardEvent) {
+                                        if (event.key === "Enter") {
+                                        await handleSaveFolderChanges();
+                                        }
+
+                                        if (event.key === "Escape") {
+                                        setShowCreateOrUpdateDialog(false);
+                                        dispatch(resetSelectedFolder());
+                                        }
+                                        }
+
+                                        document.addEventListener("keydown", handleKeyDown);
+
+                                        return () => {
+                                        document.removeEventListener("keydown", handleKeyDown);
+                                        };
+                                        })();
+                                        }, [selectedFolder]);
+
+                                        useEffect(() => {
+                                        setFolderNameValidationMessage('');
+                                        }, [selectedFolder]);
+
+                                        const getFolders = async () => {
+                                        console.log('getFolders')
+                                        return BrovisorFolderApi.getFolders()
+                                        .then((res: AxiosResponse) => {
+                                        const {data} = res.data;
+                                        console.log('data', data)
+                                        const storageFolders = localStorage.getItem( 'brovisorFolders' );
+                                        let tabsList = [];
+
+                                        setFolders( data );
+
+                                        if ( storageFolders ) {
+                                        const draggabledFolders = JSON.parse( storageFolders );
+                                        tabsList = draggabledFolders;
+                                        } else {
+                                        tabsList = getTabsListWithStorage( data );
+                                        }
+                                        console.log('tabsList', tabsList)
+                                        const updatedTabsList = tabsList.filter((tab: { uuid: string | undefined; }) => {
+                                        return data.some((folder: { id: string | undefined; }) => folder.id === tab.uuid);
+                                        });
+                                        setTabsList( updatedTabsList );
+
+                                        const activeTabId = searchParams.get( "foldersIds[]" );
+                                        const activeTabIndex = getDefaultActiveTab( tabsList, activeTabId );
+                                        setActiveTabIndex( activeTabIndex + 1 );
+                                        })
+                                        .catch((err) => {
+                                        const message = err?.response?.data?.errors?.message;
+                                        logoutWithUnexpectedToken(message || '');
+                                        toast.error(<FormattedMessage id="request-error-message" />, {
+                                        icon: <img src={crossError} alt={crossError} />,
+                                        });
+                                        });
+                                        };
+
+                                        const createFolder = async (folder: BrovisorFolderTypes) => {
+                                        const uniqueName = getFolderUniqueName(folders, folder.name);
+                                        const updatedFolder = {
+                                        ...folder,
+                                        name: uniqueName,
+                                        };
+
+                                        return BrovisorFolderApi.createNewFolder(updatedFolder)
+                                        .then((res: AxiosResponse) => {
+                                        const {data} = res.data;
+                                        const storageFolders = localStorage.getItem( 'brovisorFolders' );
+                                        const updatedFolders = [ ...folders ];
+                                        updatedFolders.push( data );
+                                        setFolders( updatedFolders );
+                                        setTabsList( getTabsListWithStorage( updatedFolders ) );
+
+                                        if ( storageFolders ) {
+                                        const draggabledFolders = JSON.parse( storageFolders );
+                                        draggabledFolders.push( data );
+                                        const changelocalTabsList = getTabsListWithStorage( draggabledFolders );
+                                        console.log('localStorage.setItem')
+                                        localStorage.setItem( 'brovisorFolders', JSON.stringify( changelocalTabsList ) );
+                                        setTabsList( changelocalTabsList );
+                                        }
+
+                                        setShowCreateOrUpdateDialog( false );
+                                        toast.success( <FormattedMessage id="folder-success-created"/>, {
+                                        icon: <img src={ crossError } alt={ crossError }/>,
+                                        } );
+                                        })
+                                        .catch((err: any) => {
+                                        const message = err?.response?.data?.errors?.message;
+                                        logoutWithUnexpectedToken(message || '');
+                                        });
+                                        };
+
+                                        const updateFolder = async (folder: BrovisorFolderTypes) => {
+                                        console.log('updateFolder')
+                                        let uniqueName = folder.name;
+
+                                        const foundFolder = folders.find((el) => el.id === folder.id);
+                                        if (foundFolder && foundFolder.name !== selectedFolder.name) {
+                                        uniqueName = getFolderUniqueName(folders, folder.name);
+                                        }
+
+                                        const updatedFolder = {
+                                        ...folder,
+                                        name: uniqueName,
+                                        };
+
+                                        return BrovisorFolderApi.updateFolder(updatedFolder)
+                                        .then((res: AxiosResponse) => {
+                                        const updatedFolder = res.data.data;
+                                        const updatedFolders = [ ...folders ];
+                                        const foundFolderIndex = updatedFolders.findIndex( ( el ) => el.id === updatedFolder.id );
+                                        const storageFolders = localStorage.getItem( 'brovisorFolders' );
+
+                                        if ( foundFolderIndex !== -1 ) {
+                                        updatedFolders[foundFolderIndex] = updatedFolder;
+                                        }
+
+                                        setFolders( updatedFolders );
+
+                                        if ( storageFolders ) {
+                                        const draggabledFolders = JSON.parse( storageFolders );
+                                        const foundIndex = draggabledFolders.findIndex( ( el: TabListTypes ) => el.uuid === updatedFolder.id );
+
+                                        if ( foundIndex !== -1 ) {
+                                        draggabledFolders[foundIndex] = updatedFolder;
+                                        const changelocalTabsList = getTabsListWithStorage( draggabledFolders );
+                                        console.log('setItem brovis 111')
+                                        localStorage.setItem( 'brovisorFolders', JSON.stringify( changelocalTabsList ) );
+                                        setTabsList( changelocalTabsList );
+                                        }
+                                        }
+
+                                        setShowCreateOrUpdateDialog( false );
+                                        toast.success( <FormattedMessage id="folder-success-updated"/>, {
+                                        icon: <img src={ crossError } alt={ crossError }/>,
+                                        } );
+                                        })
+                                        .catch((err: any) => {
+                                        const message = err?.response?.data?.errors?.message;
+                                        logoutWithUnexpectedToken(message || '');
+                                        });
+                                        };
+
+                                        const deleteFolderFromStorage = (arr:BrovisorFolders, index:number) => {
+
+                                        if (index < 0 || index >= arr.length) {
+                                        throw new Error('Invalid index');
+                                        }
+
+                                        const firstPart = arr.slice(0, index);
+                                        const secondPart = arr.slice(index + 1);
+
+                                        return firstPart.concat(secondPart);
+                                        }
+
+                                        const confirmFolderDelete = (id: string | null) => {
+                                        if (!id) {
+                                        return;
+                                        }
+
+                                        return BrovisorFolderApi.deleteFolder([id])
+                                        .then((res) => {
+                                        if(res.status === 200) {
+
+                                        const brovisorFoldersJSON:string | null = localStorage.getItem('brovisorFolders');
+                                        const localFolder:BrovisorFolders = brovisorFoldersJSON ? JSON.parse(brovisorFoldersJSON) : [];
+                                        const index = localFolder.findIndex((el) => el.uuid === id);
+                                        const newStorageFolders:BrovisorFolders = deleteFolderFromStorage(localFolder, index);
+                                        localStorage.setItem('brovisorFolders', JSON.stringify(newStorageFolders));
+                                        const newBrovisorFoldersJSON: string | null = localStorage.getItem('brovisorFolders');
+                                        setLocalsStorage(newBrovisorFoldersJSON !== null ? newBrovisorFoldersJSON : '');
+                                        }
+                                        })
+                                        .catch((err) => {
+                                        const message = err?.response?.data?.errors?.message;
+                                        logoutWithUnexpectedToken(message || '');
+                                        });
+                                        };
+
+                                        const handleEditFolder = (
+                                        folder: BrovisorFolderTypes,
+                                        folderItemDialogRef: React.RefObject<HTMLDivElement>
+                                            ) => {
+                                            setShowCreateOrUpdateDialog(true);
+                                            dispatch(editSelectedFolder(folder));
+                                            setFolderItemRef(folderItemDialogRef);
+                                            };
+
+                                            const handleValidationMessage = (selectedFolder: BrovisorFolderTypes) => {
+                                            if (selectedFolder.name === "") {
+                                            setFolderNameValidationMessage("validationMessages-required");
+
+                                            return;
+                                            } else {
+                                            setFolderNameValidationMessage("");
+                                            }
+
+                                            if (selectedFolder.name.length >= 65) {
+                                            setFolderNameValidationMessage("folder-name-validation");
+
+                                            return;
+                                            } else {
+                                            setFolderNameValidationMessage("");
+                                            }
+
+                                            return true;
+                                            };
+
+                                            const handleSaveFolderChanges = async () => {
+                                            if (selectedFolder) {
+                                            const hasError = !handleValidationMessage(selectedFolder);
+
+                                            if (hasError) {
+                                            return;
+                                            }
+
+                                            if (selectedFolder.id) {
+                                            await updateFolder(selectedFolder);
+                                            } else {
+                                            await createFolder(selectedFolder);
+                                            }
+                                            }
+                                            };
+
+                                            const handleCloseFolderDropDown = () => {
+                                            console.log('handleCloseFolderDropDown')
+                                            dispatch(resetSelectedFolder());
+                                            setShowCreateOrUpdateDialog(false);
+                                            };
+
+                                            const onDragEnd = (result: DropResult) => {
+                                            console.log('onDragEnd')
+                                            if (!result.destination) {
+                                            return;
+                                            }
+
+                                            if (result.destination.index === result.source.index) {
+                                            return;
+                                            }
+
+                                            const newTabs = Array.from(tabsList);
+                                            const [removed] = newTabs.splice(result.source.index, 1);
+                                            newTabs.splice(result.destination.index, 0, removed);
+
+                                            setTabsList(newTabs);
+                                            localStorage.setItem('brovisorFolders', JSON.stringify(newTabs));
+
+                                            const updatedActiveTabIndex =
+                                            activeTabIndex === result.source.index + 1
+                                            ? result.destination.index + 1
+                                            : activeTabIndex > result.source.index + 1 && activeTabIndex <= result.destination.index + 1
+                                            ? activeTabIndex - 1
+                                            : activeTabIndex >= result.destination.index + 1 && activeTabIndex < result.source.index + 1
+                                            ? activeTabIndex + 1
+                                            : activeTabIndex;
+
+                                            setActiveTabIndex(updatedActiveTabIndex);
+                                            };
+
+                                            const handleTabClick = (
+                                            folder: BrovisorFolderTypes | null,
+                                            index: number
+                                            ) => {
+                                            setActiveTabIndex(index);
+
+                                            if (folder) {
+                                            handelFolderChange(folder);
+                                            }
+                                            };
+
+                                            const handleOpenCreateModal = () => {
+                                            setShowCreateOrUpdateDialog(true);
+                                            };
+
+                                            const handleClickAway = () => {
+                                            setShowFolderDialog(false);
+                                            };
+
+                                            const handleAddFolder = () => {
+                                            setShowCreateOrUpdateDialog( true );
+                                            setShowFolderDialog(true);
+                                            setFolderItemRef( createFolderRef );
+                                            const newFolder = {
+                                            id: "",
+                                            name: createPlaceholder( intl, "new-folder" ),
+                                            emoji: "",
+                                            };
+                                            dispatch( setSelectedFolder( newFolder ) );
+
+                                            setTimeout( () => {
+                                            lastTabRef?.scrollIntoView( {
+                                            behavior: "smooth",
+                                            block: "nearest",
+                                            inline: "end",
+                                            } );
+                                            }, 0 );
+                                            };
+                                            console.log('tabsList', tabsList)
+                                            return (
+                                            <Grid className={ styles.brovisorFolderWrapper }>
+                                                <Grid
+                                                        container
+                                                        direction="row"
+                                                        alignItems="center"
+                                                        className={ `${ styles.brovisorFolderContainer } brovisorFolderContainer` }
+                                                >
+                                                    <DragDropContext onDragEnd={ onDragEnd }>
+                                                        <Droppable droppableId="tabs" direction="horizontal">
+                                                            { ( props ) => (
+                                                            <Tabs
+                                                                    className={styles.customScroll}
+                                                                    variant="scrollable"
+                                                                    indicatorColor="primary"
+                                                                    scrollButtons="auto"
+                                                                    allowScrollButtonsMobile
+                                                                    ref={ props.innerRef }
+                                                                    { ...props.droppableProps }
+                                                                    value={ activeTabIndex }
+                                                                    TabIndicatorProps={{
+                                                                    style: activeTabIndex === 0 ? activeTabStyles : undefined
+                                                                    }}
+                                                            >
+                                                                <Tab
+                                                                        label={
+                                                                <Grid
+                                                                        container
+                                                                        direction="row"
+                                                                        alignItems="center"
+                                                                        className={`${styles.folderItem } ${activeTabIndex === 0 ? styles.activeTabBordered : ''}`}
+                                                                >
+                                                                { createPlaceholder( intl, "all-folders" ) }
+                                                </Grid>
+                                                }
+                                                onClick={() =>
+                                                handleTabClick(
+                                                { id: "", name: createPlaceholder(intl, "all-folders") },
+                                                0
+                                                )
+                                                }
+                                                className={`${styles.tabItems} ${styles.activeTab}`}
+                                                style={{ position: tabsList.length ? 'fixed' : 'sticky' }}
+                                                />
+                                                {tabsList.map((tab, index) => {
+                                                const folder = findFolder(folders, tab);
+                                                return (
+                                                <Draggable
+                                                        key={tab.id}
+                                                        draggableId={`id-${tab.id}`}
+                                                        index={index}
+                                                        disableInteractiveElementBlocking={true}
+                                                >
+                                                    {(props) => (
+                                                    <Tab
+                                                            ref={props.innerRef}
+                                                            {...props.draggableProps}
+                                                            {...props.dragHandleProps}
+                                                            label={
+                                                    <BrovisorFolderDropdown
+                                                            folder={folder}
+                                                            handleEditFolder={handleEditFolder}
+                                                            handleDeleteFolder={confirmFolderDelete}
+                                                            setShowFolderDialog={setShowFolderDialog}
+                                                    />
+                                                    }
+                                                    onClick={() => handleTabClick(folder, index + 1)}
+                                                    className={`${styles.tabItems} ${tabsList.length ? styles.secondChildMargin : '' }`}
+                                                    />
+                                                    )}
+                                                </Draggable>
+                                                );
+                                                })}
+                                                <Tab
+                                                        id={`tab-${tabsList.length}`}
+                                                        ref={setLastTabRef}
+                                                        style={{
+                                                        position:
+                                                        showCreateOrUpdateDialog && !selectedFolder.id
+                                                        ? "unset"
+                                                : "absolute",
+                                                zIndex:
+                                                showCreateOrUpdateDialog && !selectedFolder.id
+                                                ? "unset"
+                                                : "-999",
+                                                width:
+                                                !showCreateOrUpdateDialog && !selectedFolder.id
+                                                ? "0px"
+                                                : "auto",
+                                                }}
+                                                label={
+                                                <Box ref={createFolderRef}>
+                                                    <Grid className={styles.newFolderTextStyle}>
+                                                        {createPlaceholder(intl, "new-folder")}
+                                                    </Grid>
+                                                </Box>
+                                                }
+                                                className={styles.tabItems}
+                                                />
+                                                {props.placeholder}
+                                                </Tabs>
+                                                )}
+                                                </Droppable>
+                                                </DragDropContext>
+                                                { userParamsInTeam && JSON.parse(userParamsInTeam).roleInTeam !== "user" && (
+                                                <Tooltip
+                                                        style={{ marginBottom: "6px" }}
+                                                placement="right"
+                                                title={<FormattedMessage id="create-folder" />}
+                                                disableInteractive={true}
+                                                arrow
+                                                >
+                                                <Grid
+                                                        className={`${folders.length >= 20 ? styles.disabled : ""}`}
+                                                    onClick={handleAddFolder}
+                                                    >
+                                                    <PlusOutlined className={styles.brovisorAddFolderContainer} />
+                                                </Grid>
+                                                </Tooltip>
+                                                )}
+                                                {showCreateOrUpdateDialog && folderItemRef.current && showFolderDialog && (
+                                                <Grid
+                                                        onClick={(e) => {
+                                                e.stopPropagation();
+                                                }}
+                                                >
+                                                <ClickAwayListener
+                                                        onClickAway={() => handleClickAway()}
+                                                mouseEvent="onMouseDown"
+                                                touchEvent="onTouchStart"
+                                                >
+                                                <Popper
+                                                        ref={folderDialogRef}
+                                                        open={showFolderDialog}
+                                                        anchorEl={folderItemRef.current}
+                                                        role={undefined}
+                                                        placement="bottom-start"
+                                                        transition
+                                                        disablePortal
+                                                        style={{zIndex: 1}}
+                                                >
+                                                    {({TransitionProps, placement}) => (
+                                                    <Grow
+                                                            {...TransitionProps}
+                                                            style={{
+                                                            transformOrigin:
+                                                            placement === "bottom-start"
+                                                    ? "right top"
+                                                    : "right bottom",
+                                                    }}
+                                                    >
+                                                    <Paper style={{marginTop: '5px'}}>
+                                                    <CreateOrUpdateBrovisorFolder
+                                                            folderValidationMessage={folderNameValidationMessage}
+                                                            handleSubmit={handleSaveFolderChanges}
+                                                            handleClose={handleCloseFolderDropDown}
+                                                            handleOpenCreateModal={handleOpenCreateModal}
+                                                            handleDeleteFolder={confirmFolderDelete}
+                                                    />
+                                                    </Paper>
+                                                    </Grow>
+                                                    )}
+                                                </Popper>
+                                                </ClickAwayListener>
+                                            </Grid>
+                                            )}
+                                            </Grid>
+                                            </Grid>
+                                            );
+                                            //
+                                            // return (
+                                            //     <Grid className={ styles.brovisorFolderWrapper }>
+                                            //       <Grid
+                                            //           container
+                                            //           direction="row"
+                                            //           alignItems="center"
+                                            //           className={ `${ styles.brovisorFolderContainer } brovisorFolderContainer` }
+                                            //       >
+                                            //         <DragDropContext onDragEnd={ onDragEnd }>
+                                            //           <Droppable droppableId="tabs" direction="horizontal">
+                                            //             { ( props ) => (
+                                            //                 <Tabs
+                                            //                     variant="scrollable"
+                                            //                     indicatorColor="primary"
+                                            //                     scrollButtons="auto"
+                                            //                     allowScrollButtonsMobile
+                                            //                     ref={ props.innerRef }
+                                            //                     { ...props.droppableProps }
+                                            //                     value={ activeTabIndex }
+                                            //                     TabIndicatorProps={{
+                                            //                       style: activeTabIndex === 0 ? activeTabStyles : undefined
+                                            //                     }}
+                                            //                 >
+                                            //                   <Grid
+                                            //                     onClick={() =>
+                                            //                         handleTabClick(
+                                            //                             { id: "", name: createPlaceholder(intl, "all-folders") },
+                                            //                             0
+                                            //                         )
+                                            //                     }
+                                            //                     className={`${styles.tabItems} ${styles.activeTab}  ${activeTabIndex !== 0 ? styles.activeTabBordered : ''}`}
+                                            //                     style={{ position: tabsList.length ? 'fixed' : 'sticky' }}
+                                            //                   >
+                                            //                     <Grid
+                                            //                       container
+                                            //                       // direction="row"
+                                            //                       // alignItems="center"
+                                            //                       className={`${styles.folderItem }`}
+                                            //                     >
+                                            //                       { createPlaceholder( intl, "all-folders" ) }
+                                            //                     </Grid>
+                                            //                   </Grid>
+                                            //                   {tabsList.map((tab, index) => {
+                                            //                     const folder = findFolder(folders, tab);
+                                            //                     return (
+                                            //                         <Draggable
+                                            //                             key={tab.id}
+                                            //                             draggableId={`id-${tab.id}`}
+                                            //                             index={index}
+                                            //                             disableInteractiveElementBlocking={true}
+                                            //                         >
+                                            //                           {(props) => (
+                                            //                               <Tab
+                                            //                                   ref={props.innerRef}
+                                            //                                   {...props.draggableProps}
+                                            //                                   {...props.dragHandleProps}
+                                            //                                   label={
+                                            //                                     <BrovisorFolderDropdown
+                                            //                                         folder={folder}
+                                            //                                         handleEditFolder={handleEditFolder}
+                                            //                                         handleDeleteFolder={confirmFolderDelete}
+                                            //                                     />
+                                            //                                   }
+                                            //                                   onClick={() => handleTabClick(folder, index + 1)}
+                                            //                                   className={`${styles.tabItems} ${tabsList.length ? styles.secondChildMargin : '' }`}
+                                            //                               />
+                                            //                           )}
+                                            //                         </Draggable>
+                                            //                     );
+                                            //                   })}
+                                            //                   <Tab
+                                            //                       id={`tab-${tabsList.length}`}
+                                            //                       ref={setLastTabRef}
+                                            //                       style={{
+                                            //                         position:
+                                            //                             showCreateOrUpdateDialog && !selectedFolder.id
+                                            //                                 ? "unset"
+                                            //                                 : "absolute",
+                                            //                         zIndex:
+                                            //                             showCreateOrUpdateDialog && !selectedFolder.id
+                                            //                                 ? "unset"
+                                            //                                 : "-999",
+                                            //                         width:
+                                            //                             !showCreateOrUpdateDialog && !selectedFolder.id
+                                            //                                 ? "0px"
+                                            //                                 : "auto",
+                                            //                       }}
+                                            //                       label={
+                                            //                         <Box ref={createFolderRef}>
+                                            //                           <Grid className={styles.newFolderTextStyle}>
+                                            //                             {createPlaceholder(intl, "new-folder")}
+                                            //                           </Grid>
+                                            //                         </Box>
+                                            //                       }
+                                            //                       className={styles.tabItems}
+                                            //                   />
+                                            //                   {props.placeholder}
+                                            //                 </Tabs>
+                                            //             )}
+                                            //           </Droppable>
+                                            //         </DragDropContext>
+                                            //         { userParamsInTeam && JSON.parse(userParamsInTeam).roleInTeam !== "user" && (
+                                            //             <Tooltip
+                                            //                 style={{ marginBottom: "6px" }}
+                                            //                 placement="right"
+                                            //                 title={<FormattedMessage id="create-folder" />}
+                                            //                 disableInteractive={true}
+                                            //                 arrow
+                                            //             >
+                                            //               <Grid
+                                            //                   className={`${folders.length >= 20 ? styles.disabled : ""}`}
+                                            //                   onClick={handleAddFolder}
+                                            //               >
+                                            //                 <PlusOutlined className={styles.brovisorAddFolderContainer} />
+                                            //               </Grid>
+                                            //             </Tooltip>
+                                            //         )}
+                                            //         {showCreateOrUpdateDialog && folderItemRef.current && (
+                                            //             <Grid
+                                            //                 onClick={(e) => {
+                                            //                   e.stopPropagation();
+                                            //                 }}
+                                            //             >
+                                            //               <Popper
+                                            //                   ref={folderDialogRef}
+                                            //                   open={true}
+                                            //                   anchorEl={folderItemRef.current}
+                                            //                   role={undefined}
+                                            //                   placement="bottom-start"
+                                            //                   transition
+                                            //                   disablePortal
+                                            //                   style={{ zIndex: 1 }}
+                                            //               >
+                                            //                 {({ TransitionProps, placement }) => (
+                                            //                     <Grow
+                                            //                         {...TransitionProps}
+                                            //                         style={{
+                                            //                           transformOrigin:
+                                            //                               placement === "bottom-start"
+                                            //                                   ? "right top"
+                                            //                                   : "right bottom",
+                                            //                         }}
+                                            //                     >
+                                            //                       <Paper style={{marginTop: '5px'}}>
+                                            //                         <CreateOrUpdateBrovisorFolder
+                                            //                             folderValidationMessage={folderNameValidationMessage}
+                                            //                             handleSubmit={handleSaveFolderChanges}
+                                            //                             handleClose={handleCloseFolderDropDown}
+                                            //                             handleOpenCreateModal={handleOpenCreateModal}
+                                            //                             handleDeleteFolder={confirmFolderDelete}
+                                            //                         />
+                                            //                       </Paper>
+                                            //                     </Grow>
+                                            //                 )}
+                                            //               </Popper>
+                                            //             </Grid>
+                                            //         )}
+                                            //       </Grid>
+                                            //     </Grid>
+                                            // );
+                                            }
+
+                                            export default BrovisorFolder;

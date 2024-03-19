@@ -1,0 +1,152 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <link rel="stylesheet" href="styles.css">
+  <title>Pagination Example</title>
+</head>
+<style>
+    body {
+        font-family: Arial, sans-serif;
+        margin: 20px;
+    }
+
+    .content {
+        /* Style your content area as needed */
+    }
+
+    .pagination {
+        margin-top: 20px;
+        text-align: center;
+        padding: 0 20px; /* Add padding on both sides */
+    }
+
+    .pagination-buttons {
+        display: flex;
+        justify-content: flex-end;
+        align-items: center;
+    }
+
+    button {
+        padding: 8px 16px;
+        margin: 0 4px;
+        cursor: pointer;
+    }
+
+    button:disabled {
+        opacity: 0.5;
+        cursor: not-allowed;
+    }
+
+</style>
+<body>
+
+<div class="content" id="content">
+  <!-- Your content goes here -->
+</div>
+<div class="pagination-buttons">
+  <button id="prevBtn">Previous</button>
+  <div class="pagination" id="pagination">
+
+  </div>
+  <label for="perPageSelect"></label><select id="perPageSelect">
+    <option value="5">5 </option>
+    <option value="10">10 </option>
+    <option value="20">20 </option>
+  </select>
+  <button id="nextBtn">Next</button>
+</div>
+<script>
+
+  document.addEventListener('DOMContentLoaded', function () {
+    const contentContainer = document.getElementById('content');
+    const paginationContainer = document.getElementById('pagination');
+    const prevBtn = document.getElementById('prevBtn');
+    const nextBtn = document.getElementById('nextBtn');
+    const perPageSelect = document.getElementById('perPageSelect');
+
+    let perPage = parseInt(perPageSelect.value, 10);
+    let currentPage = 1;
+    let totalPages = 1;
+
+    updatePage();
+
+    function updatePage() {
+      const apiUrl = `https://jsonplaceholder.typicode.com/posts?_page=${currentPage}&_limit=${perPage}`;
+
+      fetch(apiUrl)
+        .then(response => {
+          const linkHeader = response.headers.get('Link');
+          if (linkHeader) {
+            const lastPageMatch = linkHeader.match(/_page=(\d+)&_limit=(\d+)>; rel="last"/);
+            if (lastPageMatch) {
+              totalPages = parseInt(lastPageMatch[1]);
+            }
+          }
+          return response.json();
+        })
+        .then(data => {
+          contentContainer.innerHTML = '';
+
+          data.forEach(post => {
+            const postElement = document.createElement('div');
+            postElement.classList.add('post');
+            postElement.innerHTML = `<h2>${post.title}</h2><p>${post.body}</p>`;
+            contentContainer.appendChild(postElement);
+          });
+
+          updatePaginationLinks();
+        })
+        .catch(error => console.error('Error fetching data:', error));
+    }
+
+    function updatePaginationLinks() {
+      paginationContainer.innerHTML = '';
+
+      const visiblePageCount = 5;
+      let startPage = Math.max(1, currentPage - Math.floor(visiblePageCount / 2));
+      let endPage = Math.min(totalPages, startPage + visiblePageCount - 1);
+
+      if (endPage < visiblePageCount) {
+        startPage = 1;
+        endPage = Math.min(totalPages, visiblePageCount);
+      }
+
+      for (let i = startPage; i <= endPage; i++) {
+        const pageLink = document.createElement('span');
+        pageLink.textContent = i;
+        pageLink.addEventListener('click', function () {
+          currentPage = i;
+          updatePage();
+        });
+
+        paginationContainer.appendChild(pageLink);
+      }
+
+      prevBtn.disabled = currentPage === 1;
+      nextBtn.disabled = currentPage === totalPages;
+    }
+
+    prevBtn.addEventListener('click', function () {
+      if (currentPage > 1) {
+        currentPage--;
+        updatePage();
+      }
+    });
+
+    nextBtn.addEventListener('click', function () {
+      if (currentPage < totalPages) {
+        currentPage++;
+        updatePage();
+      }
+    });
+
+    perPageSelect.addEventListener('change', function () {
+      perPage = parseInt(perPageSelect.value, 10);
+      updatePage();
+    });
+  });
+</script>
+</body>
+</html>

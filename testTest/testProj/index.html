@@ -1,0 +1,1284 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Квартиры</title>
+<!--  <style>-->
+<!--      ul {-->
+<!--          list-style: none;-->
+<!--          padding-left: 0;-->
+<!--      }-->
+
+<!--      .house {-->
+<!--          margin-left: 20px;-->
+<!--      }-->
+
+<!--      .apartment {-->
+<!--          margin-left: 40px;-->
+<!--      }-->
+
+<!--      .resident-card {-->
+<!--          border: 1px solid #ccc;-->
+<!--          padding: 10px;-->
+<!--          margin: 5px;-->
+<!--          display: inline-block;-->
+<!--      }-->
+<!--  </style>-->
+</head>
+<body>
+
+<div id="tree-container"></div>
+<div id="residents-container"></div>
+
+<script>
+  // var xhr = new XMLHttpRequest();
+  // var url = 'https://dateandtimeapi.com/api/v1/now';
+  //
+  // xhr.open('GET', url, true);
+  // xhr.setRequestHeader('Content-Type', 'application/json');
+  //
+  // xhr.onload = function () {
+  //   if (xhr.status >= 200 && xhr.status < 300) {
+  //     // Request was successful
+  //     var responseData = JSON.parse(xhr.responseText);
+  //     // Do something with the current time data (responseData)
+  //     console.log(responseData);
+  //   } else {
+  //     // Request failed
+  //     console.error('Date and Time API request failed. Status:', xhr.status);
+  //   }
+  // };
+  //
+  // xhr.onerror = function () {
+  //   // There was a network error
+  //   console.error('Network error occurred while making the Date and Time API request.');
+  // };
+  //
+  // xhr.send();
+  //
+
+
+// let arr1 = [
+//   {id:1, name: 'test1'},
+//   {id:3, name: 'test2'},
+//   {id:5, name: 'test3'}
+// ]
+//
+// let arr2 = [
+//   {id:1, name: '',age:2},
+//   {id:7, name: '', age:5},
+//   {id:9, name: '', age:45},
+//   {id:11, name: '', age:43},
+//   {id:19, name: '', age:64}
+// ]
+//
+//
+//   arr2 = arr2.map(obj2 => {
+//     const matchingObj1 = arr1.find(obj1 => obj1.id === obj2.id);
+//     if (matchingObj1) {
+//       obj2.name = matchingObj1.name;
+//     }
+//     return obj2;
+//   });
+//
+//   console.log('arr2', arr2);
+</script>
+
+</body>
+</html>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<template>
+  <div
+          class="d-flex align-center created-block"
+  >
+    <div
+            style="word-break: break-all;"
+            class="d-flex align-center"
+    >
+      <div class="created-content">
+        <div class="text-capitalize created-date">
+          <!-- Formatted LAUNCHED -->
+          {{ browserProfile.lastStartTime ? lastStartTime : '' }}
+        </div>
+      </div>
+    </div>
+  </div>
+</template>
+
+<script>
+  import { mapGetters } from 'vuex'
+  import browserProfileActions from '@/mixins/browserProfileActions'
+  import moment from 'moment/moment'
+
+  export default {
+    name: 'BrowserProfilesMainTableCellLauncheds',
+    mixins: [browserProfileActions],
+    props: {
+      browserProfile: {
+        type: Object,
+        required: true,
+        default: () => {}
+      }
+    },
+
+    data () {
+      return {
+        moment
+      }
+    },
+
+    computed: {
+      ...mapGetters({
+        profile: 'main/profile',
+        browserProfilesLastStartTime: 'browserProfiles/browserProfilesLastStartTime',
+        browserProfiles: 'browserProfiles/browserProfiles'
+      }),
+
+      lastStartTime () {
+        console.log('AAAAAAAAAAAAAAAAAAAAAA')
+        this.browserProfiles.all.map(browserProfile => {
+          const matchingItem = this.browserProfilesLastStartTime.find(item => item.browserProfileId === browserProfile.id)
+          console.log('matchingItem-7-7-7-7', matchingItem)
+          if (matchingItem) {
+            const dateWithTimezone = moment(matchingItem.browserProfileLastStartTime)
+            console.log('1111111111111111111111111111')
+            browserProfile.lastStartTime = moment
+              .parseZone(dateWithTimezone)
+              .local()
+              .locale(this.profile.language)
+              .format('DD MMM HH:mm')
+          }
+
+          return browserProfile
+        })
+        // console.log('this.browserProfile.lastStartTime', this.browserProfile.lastStartTime)
+
+        console.log('lllllllllllllllbrowserProfilesLastStartTime', this.browserProfilesLastStartTime)
+        return this.browserProfile.lastStartTime
+
+        // if (this.browserProfilesLastStartTime.length === 0) {
+        //   const dateWithTimezone = moment(this.browserProfile.lastStartTime)
+        //   console.log('bbbbbbbbbbbbbbbbbbbbbbb1111')
+        //   return moment
+        //     .parseZone(dateWithTimezone)
+        //     .local()
+        //     .locale(this.profile.language)
+        //     .format('DD MMM HH:mm')
+        // } else {
+        //   console.log('aaaaaaaaaaaaaaaaaaaaaaaaaa1111')
+        //   return this.browserProfile.lastStartTime
+        // }
+
+        // const dateWithTimezone = moment(this.browserProfile.lastStartTime)
+        //
+        // return moment
+        //   .parseZone(dateWithTimezone)
+        //   .local()
+        //   .locale(this.profile.language)
+        //   .format('DD MMM HH:mm')
+
+        // if (this.browserProfile.lastStartTime) {
+        //   // Convert UTC to user's time zone
+        //   const dateWithTimezone = moment(this.browserProfile.lastStartTime).format('YYYY-MM-DDTHH:mm:ss')
+        //   return this.moment
+        //     .parseZone(dateWithTimezone)
+        //     .local()
+        //     .locale(this.profile.language)
+        //     .format('DD MMM HH:mm')
+        // } else {
+        //   return '-'
+        // }
+      }
+    }
+
+  }
+</script>
+
+<style scoped>
+    .created-block {
+        font-size: 16px;
+    }
+    .created-content{
+        margin-left: 4px;
+    }
+
+    .created-date {
+        font-size: 14px;
+    }
+</style>
+
+
+/////////////////////////////////////////////////
+
+
+<template>
+  <div
+          class="d-flex align-center created-block"
+  >
+    <div
+            style="word-break: break-all;"
+            class="d-flex align-center"
+    >
+      <div class="created-content">
+        <div class="text-capitalize created-date">
+          <!-- Formatted LAUNCHED -->
+          {{ browserProfile.lastStartTime ? lastStartTime : '' }}
+        </div>
+      </div>
+    </div>
+  </div>
+</template>
+
+<script>
+  import { mapGetters } from 'vuex'
+  import browserProfileActions from '@/mixins/browserProfileActions'
+  import moment from 'moment/moment'
+
+  export default {
+    name: 'BrowserProfilesMainTableCellLauncheds',
+    mixins: [browserProfileActions],
+    props: {
+      browserProfile: {
+        type: Object,
+        required: true,
+        default: () => {}
+      }
+    },
+
+    data () {
+      return {
+        moment
+      }
+    },
+
+    computed: {
+      ...mapGetters({
+        profile: 'main/profile',
+        browserProfilesLastStartTime: 'browserProfiles/browserProfilesLastStartTime',
+        browserProfiles: 'browserProfiles/browserProfiles'
+      }),
+
+      lastStartTime () {
+        console.log('AAAAAAAAAAAAAAAAAAAAAA')
+        this.browserProfiles.all.map(browserProfile => {
+          const matchingItem = this.browserProfilesLastStartTime.find(item => item.browserProfileId === browserProfile.id)
+          console.log('matchingItem-7-7-7-7', matchingItem)
+          if (matchingItem) {
+            const dateWithTimezone = moment(matchingItem.browserProfileLastStartTime)
+            console.log('1111111111111111111111111111')
+            browserProfile.lastStartTime = moment
+              .parseZone(dateWithTimezone)
+              .local()
+              .locale(this.profile.language)
+              .format('DD MMM HH:mm')
+          }
+
+          return browserProfile
+        })
+
+        console.log('this.browserProfile.lastStartTime', this.browserProfile.lastStartTime)
+        return this.browserProfile.lastStartTime
+
+      }
+    }
+
+  }
+</script>
+
+<style scoped>
+    .created-block {
+        font-size: 16px;
+    }
+    .created-content{
+        margin-left: 4px;
+    }
+
+    .created-date {
+        font-size: 14px;
+    }
+</style>
+
+
+////////////////////////
+
+
+<template>
+  <div
+          class="d-flex align-center created-block"
+  >
+    <div
+            style="word-break: break-all;"
+            class="d-flex align-center"
+    >
+      <div class="created-content">
+        <div class="text-capitalize created-date">
+          <!-- Formatted LAUNCHED -->
+          {{ browserProfile.lastStartTime ? lastStartTime : '' }}
+        </div>
+      </div>
+    </div>
+  </div>
+</template>
+
+<script>
+  import { mapGetters } from 'vuex'
+  import browserProfileActions from '@/mixins/browserProfileActions'
+  import moment from 'moment/moment'
+
+  export default {
+    name: 'BrowserProfilesMainTableCellLauncheds',
+    mixins: [browserProfileActions],
+    props: {
+      browserProfile: {
+        type: Object,
+        required: true,
+        default: () => {}
+      }
+    },
+
+    data () {
+      return {
+        moment
+      }
+    },
+
+    computed: {
+      ...mapGetters({
+        profile: 'main/profile',
+        browserProfilesLastStartTime: 'browserProfiles/browserProfilesLastStartTime',
+        browserProfiles: 'browserProfiles/browserProfiles'
+      }),
+
+      lastStartTime () {
+        console.log('AAAAAAAAAAAAAAAAAAAAAA')
+        this.browserProfiles.all.map(browserProfile => {
+          const matchingItem = this.browserProfilesLastStartTime.find(item => item.browserProfileId === browserProfile.id)
+          console.log('matchingItem-7-7-7-7', matchingItem)
+
+          if (browserProfile.lastStartTime) {
+            console.log('browserProfile-7-6-6-7-8-9-9-8', browserProfile)
+          }
+          if (matchingItem) {
+            const dateWithTimezone = moment(matchingItem.browserProfileLastStartTime)
+            console.log('1111111111111111111111111111')
+            browserProfile.lastStartTime = moment
+              .parseZone(dateWithTimezone)
+              .local()
+              .locale(this.profile.language)
+              .format('D MMM HH:mm')
+          }
+
+          return browserProfile
+        })
+        // console.log('this.browserProfile.lastStartTime', this.browserProfile.lastStartTime)
+
+        // console.log('lllllllllllllllbrowserProfilesLastStartTime', this.browserProfilesLastStartTime)
+        // console.log('this.browserProfile.lastStartTime', this.browserProfile.lastStartTime)
+
+        return this.browserProfile.lastStartTime
+
+        // if (this.browserProfile.lastStartTime) {
+        //   const dateWithTimezone = moment(this.browserProfile.lastStartTime)
+        //   console.log('MMMMMMMMMMMMMMMMMMM')
+        //   return moment
+        //     .parseZone(dateWithTimezone)
+        //     .local()
+        //     .locale(this.profile.language)
+        //     .format('DD MMM HH:mm')
+        // }
+
+        // if (this.browserProfile.lastStartTime) {
+        //   // Convert UTC to user's time zone
+        //   const dateWithTimezone = moment(this.browserProfile.lastStartTime).format('YYYY-MM-DDTHH:mm:ss')
+        //   return this.moment
+        //     .parseZone(dateWithTimezone)
+        //     .local()
+        //     .locale(this.profile.language)
+        //     .format('DD MMM HH:mm')
+        // } else {
+        //   return '-'
+        // }
+      }
+    }
+
+  }
+</script>
+
+<style scoped>
+    .created-block {
+        font-size: 16px;
+    }
+    .created-content{
+        margin-left: 4px;
+    }
+
+    .created-date {
+        font-size: 14px;
+    }
+</style>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+/////////////////////////////////
+
+
+
+
+
+<template>
+  <div
+          class="d-flex align-center created-block"
+  >
+    <div
+            style="word-break: break-all;"
+            class="d-flex align-center"
+    >
+      <div class="created-content">
+        <div class="text-capitalize created-date">
+          <!-- Formatted LAUNCHED -->
+          {{ browserProfile.lastStartTime ? lastStartTime : '' }}
+        </div>
+      </div>
+    </div>
+  </div>
+</template>
+
+<script>
+  import { mapGetters } from 'vuex'
+  import browserProfileActions from '@/mixins/browserProfileActions'
+  import moment from 'moment/moment'
+
+  export default {
+    name: 'BrowserProfilesMainTableCellLauncheds',
+    mixins: [browserProfileActions],
+    props: {
+      browserProfile: {
+        type: Object,
+        required: true,
+        default: () => {}
+      }
+    },
+
+    data () {
+      return {
+        moment
+      }
+    },
+
+    computed: {
+      ...mapGetters({
+        profile: 'main/profile',
+        browserProfilesLastStartTime: 'browserProfiles/browserProfilesLastStartTime',
+        browserProfiles: 'browserProfiles/browserProfiles'
+      }),
+
+      lastStartTime () {
+        console.log('AAAAAAAAAAAAAAAAAAAAAA')
+        if (!this.browserProfile.lastStartTime) {
+          this.browserProfiles.all.map(browserProfile => {
+            const matchingItem = this.browserProfilesLastStartTime.find(item => item.browserProfileId === browserProfile.id)
+            console.log('matchingItem-7-7-7-7', matchingItem)
+
+            if (browserProfile.lastStartTime) {
+              console.log('browserProfile-7-6-6-7-8-9-9-8', browserProfile.lastStartTime)
+            }
+            if (matchingItem) {
+              const dateWithTimezone = moment(matchingItem.browserProfileLastStartTime)
+              console.log('1111111111111111111111111111')
+              browserProfile.lastStartTime = moment
+                .parseZone(dateWithTimezone)
+                .local()
+                .locale(this.profile.language)
+                .format('DD MMM HH:mm')
+            }
+
+            return browserProfile
+          })
+        } else {
+          const dateWithTimezone = moment(this.browserProfile.lastStartTime)
+          console.log('MMMMMMMMMMMMMMMMMMM')
+          return moment
+            .parseZone(dateWithTimezone)
+            .local()
+            .locale(this.profile.language)
+            .format('DD MMM HH:mm')
+        }
+      }
+    }
+
+  }
+</script>
+
+<style scoped>
+    .created-block {
+        font-size: 16px;
+    }
+    .created-content{
+        margin-left: 4px;
+    }
+
+    .created-date {
+        font-size: 14px;
+    }
+</style>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<template>
+  <div
+          class="d-flex align-center created-block"
+  >
+    <div
+            style="word-break: break-all;"
+            class="d-flex align-center"
+    >
+      <div class="created-content">
+        <div class="text-capitalize created-date">
+          <!-- Formatted LAUNCHED -->
+          {{ browserProfile.lastStartTime ? lastStartTime : '' }}
+        </div>
+      </div>
+    </div>
+  </div>
+</template>
+
+<script>
+  import { mapGetters } from 'vuex'
+  import browserProfileActions from '@/mixins/browserProfileActions'
+  import moment from 'moment/moment'
+
+  export default {
+    name: 'BrowserProfilesMainTableCellLauncheds',
+    mixins: [browserProfileActions],
+    props: {
+      browserProfile: {
+        type: Object,
+        required: true,
+        default: () => {}
+      }
+    },
+
+    data () {
+      return {
+        moment
+      }
+    },
+
+    computed: {
+      ...mapGetters({
+        profile: 'main/profile',
+        browserProfilesLastStartTime: 'browserProfiles/browserProfilesLastStartTime',
+        browserProfiles: 'browserProfiles/browserProfiles'
+      }),
+      lastStartTime () {
+        console.log('AAAAAAAAAAAAAAAAAAAAAA')
+
+        this.browserProfiles.all.map(browserProfile => {
+          const matchingItem = this.browserProfilesLastStartTime.find(item => item.browserProfileId === browserProfile.id)
+          console.log('matchingItem-7-7-7-7', matchingItem)
+
+          if (matchingItem) {
+            const dateWithTimezone = moment(matchingItem.browserProfileLastStartTime)
+            console.log('1111111111111111111111111111')
+            browserProfile.lastStartTime = moment
+              .parseZone(dateWithTimezone)
+              .local()
+              .locale(this.profile.language)
+              .format('DD MMM HH:mm')
+          }
+
+          return browserProfile
+        })
+        if (this.browserProfile.lastStartTime) {
+          const dateWithTimezone = moment(this.browserProfile.lastStartTime)
+          console.log('MMMMMMMMMMMMMMMMMMM')
+          return moment
+            .parseZone(dateWithTimezone)
+            .local()
+            .locale(this.profile.language)
+            .format('DD MMM HH:mm')
+        }
+      }
+
+    }
+
+  }
+</script>
+
+<style scoped>
+    .created-block {
+        font-size: 16px;
+    }
+    .created-content{
+        margin-left: 4px;
+    }
+
+    .created-date {
+        font-size: 14px;
+    }
+</style>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+//////////////////////
+<template>
+  <div
+          class="d-flex align-center created-block"
+  >
+    <div
+            style="word-break: break-all;"
+            class="d-flex align-center"
+    >
+      <div class="created-content">
+        <div class="text-capitalize created-date">
+          <!-- Formatted LAUNCHED -->
+          {{ browserProfile.lastStartTime ? lastStartTime : '' }}
+        </div>
+      </div>
+    </div>
+  </div>
+</template>
+
+<script>
+  import { mapGetters } from 'vuex'
+  import browserProfileActions from '@/mixins/browserProfileActions'
+  import moment from 'moment/moment'
+
+  export default {
+    name: 'BrowserProfilesMainTableCellLauncheds',
+    mixins: [browserProfileActions],
+    props: {
+      browserProfile: {
+        type: Object,
+        required: true,
+        default: () => {}
+      }
+    },
+
+    data () {
+      return {
+        moment
+      }
+    },
+
+    computed: {
+      ...mapGetters({
+        profile: 'main/profile',
+        browserProfilesLastStartTime: 'browserProfiles/browserProfilesLastStartTime',
+        browserProfiles: 'browserProfiles/browserProfiles'
+      }),
+
+      lastStartTime () {
+        console.log('AAAAAAAAAAAAAAAAAAAAAA')
+        this.browserProfiles.all.map(browserProfile => {
+          const matchingItem = this.browserProfilesLastStartTime.find(item => item.browserProfileId === browserProfile.id)
+          console.log('matchingItem-7-7-7-7', matchingItem)
+          if (matchingItem) {
+            const dateWithTimezone = moment(matchingItem.browserProfileLastStartTime)
+            console.log('1111111111111111111111111111')
+            browserProfile.lastStartTime = moment
+              .parseZone(dateWithTimezone)
+              .local()
+              .locale(this.profile.language)
+              .format('DD MMM HH:mm')
+          }
+
+          return browserProfile
+        })
+        console.log('this.browserProfile.lastStartTime  0-0-0-0-0-0-', this.browserProfile.lastStartTime)
+        return this.browserProfile.lastStartTime
+      }
+    }
+
+  }
+</script>
+
+<style scoped>
+    .created-block {
+        font-size: 16px;
+    }
+    .created-content{
+        margin-left: 4px;
+    }
+
+    .created-date {
+        font-size: 14px;
+    }
+</style>
+
+////////////////////////////////////
+
+
+
+
+
+
+
+<template>
+  <div class="d-flex align-center created-block">
+    <div
+            style="word-break: break-all;"
+            class="d-flex align-center"
+    >
+      <div class="created-content">
+        <div class="text-capitalize created-date">
+          <!-- Formatted LAUNCHED -->
+          {{ formattedLastStartTime }}
+        </div>
+      </div>
+    </div>
+  </div>
+</template>
+
+<script>
+  import { mapGetters } from 'vuex'
+  import browserProfileActions from '@/mixins/browserProfileActions'
+  import moment from 'moment/moment'
+
+  export default {
+    name: 'BrowserProfilesMainTableCellLauncheds',
+    mixins: [browserProfileActions],
+    props: {
+      browserProfile: {
+        type: Object,
+        required: true,
+        default: () => {}
+      }
+    },
+
+    data () {
+      return {
+        moment
+      }
+    },
+
+    computed: {
+      ...mapGetters({
+        profile: 'main/profile',
+        browserProfilesLastStartTime: 'browserProfiles/browserProfilesLastStartTime'
+      }),
+
+      matchingItem () {
+        return this.browserProfilesLastStartTime.find(
+          (item) => item.browserProfileId === this.browserProfile.id
+        )
+      },
+
+      formattedLastStartTime () {
+        console.log('KKKKKKKKKKKKKKKKKKKKKKKKKKKKKK')
+        if (this.matchingItem) {
+          const dateWithTimezone = moment(this.matchingItem.browserProfileLastStartTime)
+          return moment
+            .parseZone(dateWithTimezone)
+            .local()
+            .locale(this.profile.language)
+            .format('D MMM HH:mm')
+        } else {
+          if (!this.browserProfile.lastStartTime) return ''
+          const dateWithTimezone = moment(this.browserProfile.lastStartTime)
+          console.log('CCCCCCCCCCCCCCCCCCC11')
+          return moment
+            .parseZone(dateWithTimezone)
+            .local()
+            .locale(this.profile.language)
+            .format('DD MMM HH:mm')
+        }
+      }
+    },
+
+    watch: {
+      matchingItem (newValue) {
+        if (newValue) {
+          // const dateWithTimezone = moment(newValue.browserProfileLastStartTime)
+          // this.$emit('update:browserProfile', {
+          //   ...this.browserProfile,
+          //   lastStartTime: moment
+          //     .parseZone(dateWithTimezone)
+          //     .local()
+          //     .locale(this.profile.language)
+          //     .format('D MMM HH:mm')
+          // })
+        }
+      }
+    }
+  }
+</script>
+
+<style scoped>
+    .created-block {
+        font-size: 16px;
+    }
+    .created-content {
+        margin-left: 4px;
+    }
+    .created-date {
+        font-size: 14px;
+    }
+</style>
+
+//////////////////////
+
+
+
+<!--<template>-->
+<!--  <v-container fluid fill-height>-->
+<!--    <v-alert-->
+<!--      v-if="showNotification"-->
+<!--      dense-->
+<!--      text-->
+<!--      type="success"-->
+<!--      class="notification-bar"-->
+<!--    >-->
+<!--      Confirmation email has been sent!-->
+<!--    </v-alert>-->
+<!--    <v-row align="center" justify="center">-->
+<!--      <v-col cols="12" sm="8" md="4">-->
+<!--        <v-card class="custom-card" flat>-->
+<!--          <div class="d-flex justify-center pb-8">-->
+<!--          <icon-->
+<!--            name='verified24'-->
+<!--            style="height: 96px; width: 96px;"-->
+<!--          />-->
+<!--          </div>-->
+<!--          <v-card-title class="headline confirm-email d-flex justify-center pt-0 pl-0 pr-0">-->
+<!--            {{ $t("overview.confirmEmail") }}-->
+<!--          </v-card-title>-->
+<!--          <v-card-text class='pl-2 pr-2 pb-0 pt-2'>-->
+<!--            <div class="subheading sent-letter d-flex justify-center text-center letter-with-link">-->
+<!--              We sent an email with a link to activate your account to test@example.com.-->
+<!--            </div>-->
+<!--            <div class='support-block pt-5' v-if="showSupportBlock">-->
+<!--              <div class="subheading d-flex justify-center flex-column text-center notice-restrictions">-->
+<!--                <p>Too many attempts to send an email.</p>-->
+<!--                <p>To manually confirm the email, contact support.</p>-->
+<!--              </div>-->
+<!--              <v-card-actions class="d-flex justify-center text-center">-->
+<!--                <v-card-text color="primary" class='pt-3'>-->
+<!--                  <span class='link'>-->
+<!--                   Write to support-->
+<!--                  </span>-->
+<!--                </v-card-text>-->
+<!--              </v-card-actions>-->
+<!--            </div>-->
+<!--          </v-card-text>-->
+<!--          <v-card-actions v-if="!showSupportBlock" class="d-flex justify-center text-center send-email-block">-->
+<!--            <v-card-text color="primary" @click="resendEmail">-->
+<!--             <span :class="{ 'link': !emailResent }">-->
+<!--               Send email again-->
+<!--               <template v-if="emailResent"> in {{ countdown }}</template>-->
+<!--             </span>-->
+<!--            </v-card-text>-->
+<!--          </v-card-actions>-->
+<!--          <v-divider></v-divider>-->
+<!--          <v-card-text class="d-flex justify-center text-center">-->
+<!--            <div>-->
+<!--              If you have not received the email, check your spam folder or resend the email.-->
+<!--            </div>-->
+<!--          </v-card-text>-->
+<!--        </v-card>-->
+<!--      </v-col>-->
+<!--    </v-row>-->
+<!--  </v-container>-->
+<!--</template>-->
+
+<!--<script>-->
+<!--import Icon from '@/assets/icons/Icon.vue'-->
+
+<!--export default {-->
+<!--  name: 'ConfirmEmail',-->
+<!--  components: { Icon },-->
+<!--  data() {-->
+<!--    return {-->
+<!--      showNotification: false,-->
+<!--      emailResent: false,-->
+<!--      countdown: '00:05',-->
+<!--      resendAttempts: 0,-->
+<!--      maxResendAttempts: 3,-->
+<!--      showSupportBlock: false,-->
+<!--    };-->
+<!--  },-->
+
+<!--  methods: {-->
+<!--    resendEmail() {-->
+<!--      if (this.resendAttempts >= this.maxResendAttempts) {-->
+<!--        this.showSupportBlock = true;-->
+<!--        return;-->
+<!--      }-->
+
+<!--      this.showNotification = true;-->
+<!--      this.emailResent = true;-->
+<!--      this.resendAttempts++;-->
+
+<!--      let seconds = 40;-->
+<!--      this.updateCountdown(seconds);-->
+
+<!--      const intervalId = setInterval(() => {-->
+<!--        seconds&#45;&#45;;-->
+<!--        this.updateCountdown(seconds);-->
+
+<!--        if (seconds === 0) {-->
+<!--          this.showNotification = false;-->
+<!--          this.emailResent = false;-->
+<!--          clearInterval(intervalId);-->
+<!--        }-->
+<!--      }, 1000);-->
+<!--    },-->
+
+<!--    updateCountdown(seconds) {-->
+<!--      this.countdown = `00:${String(seconds).padStart(2, '0')}`;-->
+<!--    },-->
+<!--  }-->
+<!--};-->
+<!--</script>-->
+
+<!--<style scoped lang="scss">-->
+
+<!--.link {-->
+<!--  color: #B645EE;-->
+<!--  font-family: Roboto, sans-serif;-->
+<!--  font-size: 16px;-->
+<!--  font-style: normal;-->
+<!--  font-weight: 400;-->
+<!--  line-height: 24px;-->
+<!--  cursor: pointer;-->
+<!--  border-bottom: 1px solid #F4E3FD;-->
+<!--}-->
+
+<!--.notice-restrictions {-->
+<!--  color: #B71921;-->
+<!--  font-family: Roboto, sans-serif;-->
+<!--  font-size: 16px;-->
+<!--  font-style: normal;-->
+<!--  font-weight: 400;-->
+<!--  line-height: 24px;-->
+<!--}-->
+
+<!--.notice-restrictions > p {-->
+<!--  margin-bottom: 0;-->
+<!--}-->
+
+<!--.confirm-email {-->
+<!--  font-family: Roboto, sans-serif!important;-->
+<!--  font-size: 30px!important;-->
+<!--  font-style: normal;-->
+<!--  color: var(&#45;&#45;text-text-primary, #19181A);-->
+<!--  text-align: center;-->
+<!--  font-weight: 700;-->
+<!--  line-height: 36px;-->
+<!--}-->
+
+<!--.sent-letter {-->
+<!--  color: #19181A;-->
+<!--  text-align: center;-->
+<!--  font-family: Roboto, sans-serif;-->
+<!--  font-size: 16px;-->
+<!--  font-style: normal;-->
+<!--  font-weight: 400;-->
+<!--  line-height: 24px;-->
+<!--}-->
+
+<!--.custom-card {-->
+<!--  width: 400px;-->
+<!--}-->
+
+<!--.letter-with-link {-->
+<!--  font-family: Roboto, sans-serif;-->
+<!--  font-size: 16px;-->
+<!--  font-style: normal;-->
+<!--  font-weight: 400;-->
+<!--  line-height: 24px;-->
+<!--}-->
+
+<!--.notification-bar {-->
+<!--  position: absolute;-->
+<!--  width: 745px;-->
+<!--  height: 72px;-->
+<!--  border: 1px solid #B6ECD4;-->
+<!--  border-radius: 8px;-->
+<!--  background: #DDF6EB!important;-->
+<!--  top: 0;-->
+<!--  left: 50%;-->
+<!--  transform: translateX(-50%);-->
+<!--  z-index: 11;-->
+<!--}-->
+<!--</style>-->
+
+
+
+
+
+
+
+
+
+
+
+
+
+<template>
+  <v-container fluid fill-height>
+    <v-alert
+            v-if="showNotification"
+            dense
+            text
+            type="success"
+            class="notification-bar"
+    >
+      Confirmation email has been sent!
+    </v-alert>
+    <v-row align="center" justify="center">
+      <v-col cols="12" sm="8" md="4">
+        <v-card class="custom-card" flat>
+          <div class="d-flex justify-center pb-8">
+            <icon
+                    name='verified24'
+                    style="height: 96px; width: 96px;"
+            />
+          </div>
+          <v-card-title class="headline confirm-email d-flex justify-center pt-0 pl-0 pr-0">
+            {{ $t("overview.confirmEmail") }}
+          </v-card-title>
+          <v-card-text class='pl-2 pr-2 pb-0 pt-2'>
+            <div class="subheading sent-letter d-flex justify-center text-center letter-with-link">
+              We sent an email with a link to activate your account to test@example.com.
+            </div>
+            <div class='support-block pt-5' v-if="showSupportBlock">
+              <div class="subheading d-flex justify-center flex-column text-center notice-restrictions">
+                <p>Too many attempts to send an email.</p>
+                <p>To manually confirm the email, contact support.</p>
+              </div>
+              <v-card-actions class="d-flex justify-center text-center">
+                <v-card-text color="primary" class='pt-3'>
+                  <span class='link'>
+                   Write to support
+                  </span>
+                </v-card-text>
+              </v-card-actions>
+            </div>
+          </v-card-text>
+          <v-card-actions v-if="!showSupportBlock" class="d-flex justify-center text-center send-email-block">
+            <v-card-text color="primary" @click="resendEmail">
+             <span :class="{ 'link': !emailResent }">
+               Send email again
+               <template v-if="emailResent"> in {{ countdown }}</template>
+             </span>
+            </v-card-text>
+          </v-card-actions>
+          <v-divider></v-divider>
+          <v-card-text class="d-flex justify-center text-center">
+            <div>
+              If you have not received the email, check your spam folder or resend the email.
+            </div>
+          </v-card-text>
+        </v-card>
+      </v-col>
+    </v-row>
+  </v-container>
+</template>
+
+<script>
+  import Icon from '@/assets/icons/Icon.vue'
+
+  export default {
+    name: 'ConfirmEmail',
+    components: { Icon },
+    data() {
+      return {
+        showNotification: false,
+        emailResent: false,
+        countdown: '00:05',
+        resendAttempts: 0,
+        maxResendAttempts: 3,
+        showSupportBlock: false,
+      };
+    },
+
+    methods: {
+      resendEmail() {
+        if (this.resendAttempts >= this.maxResendAttempts) {
+          this.showSupportBlock = true;
+          return;
+        }
+
+        this.showNotification = true;
+        this.emailResent = true;
+        this.resendAttempts++;
+
+        let seconds = this.getCountdownFromLocalStorage() || 40;
+        this.updateCountdown(seconds);
+
+        const intervalId = setInterval(() => {
+          seconds--;
+          this.updateCountdown(seconds);
+          this.setCountdownToLocalStorage(seconds);
+
+          if (seconds === 0) {
+            this.showNotification = false;
+            this.emailResent = false;
+            clearInterval(intervalId);
+          }
+        }, 1000);
+      },
+
+      updateCountdown(seconds) {
+        this.countdown = `00:${String(seconds).padStart(2, '0')}`;
+      },
+
+      getCountdownFromLocalStorage() {
+        return parseInt(localStorage.getItem('countdownSeconds'), 10);
+      },
+
+      setCountdownToLocalStorage(seconds) {
+        localStorage.setItem('countdownSeconds', seconds);
+      },
+    },
+  };
+</script>
+
+<style scoped lang="scss">
+
+    .link {
+        color: #B645EE;
+        font-family: Roboto, sans-serif;
+        font-size: 16px;
+        font-style: normal;
+        font-weight: 400;
+        line-height: 24px;
+        cursor: pointer;
+        border-bottom: 1px solid #F4E3FD;
+    }
+
+    .notice-restrictions {
+        color: #B71921;
+        font-family: Roboto, sans-serif;
+        font-size: 16px;
+        font-style: normal;
+        font-weight: 400;
+        line-height: 24px;
+    }
+
+    .notice-restrictions > p {
+        margin-bottom: 0;
+    }
+
+    .confirm-email {
+        font-family: Roboto, sans-serif!important;
+        font-size: 30px!important;
+        font-style: normal;
+        color: var(--text-text-primary, #19181A);
+        text-align: center;
+        font-weight: 700;
+        line-height: 36px;
+    }
+
+    .sent-letter {
+        color: #19181A;
+        text-align: center;
+        font-family: Roboto, sans-serif;
+        font-size: 16px;
+        font-style: normal;
+        font-weight: 400;
+        line-height: 24px;
+    }
+
+    .custom-card {
+        width: 400px;
+    }
+
+    .letter-with-link {
+        font-family: Roboto, sans-serif;
+        font-size: 16px;
+        font-style: normal;
+        font-weight: 400;
+        line-height: 24px;
+    }
+
+    .notification-bar {
+        position: absolute;
+        width: 745px;
+        height: 72px;
+        border: 1px solid #B6ECD4;
+        border-radius: 8px;
+        background: #DDF6EB!important;
+        top: 0;
+        left: 50%;
+        transform: translateX(-50%);
+        z-index: 11;
+    }
+</style>
+
+
+
+
+
+
+
