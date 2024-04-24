@@ -1,0 +1,129 @@
+<!doctype html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport"
+          content="width=device-width, user-scalable=no, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>Document</title>
+</head>
+<body>
+
+<script>
+    // Sinxron kod
+// function F1(){
+//     console.log('1')
+// }
+// function F2(){
+//     console.log('2')
+// }
+// function F3(){
+//     console.log('3')
+// }
+//     F1()
+//     F2()
+//     F3()
+
+///// asinxron kod
+//     function F11(){
+//         console.log('11')
+//     }
+//     function F22(){
+//         setTimeout( () => {
+//             console.log('22')
+//         }, 2000 )
+//     }
+//     function F33(){
+//         console.log('33')
+//     }
+//     F11()
+//     F22()
+//     F33()
+
+    // Promis@ javascripti standrt clasneric e vor@ hnaravorutyun e talis karavarel asinxron gorc@ntacner@;
+    // promis@ ir konstruktorum aysinqn vorpes parametr @ndunum e ananun funkcia, vorn el ir hertin vorpes
+    // parametr @ndunum e resolve, reject voronq functianer en; resolve ashxatum e ayn jamanak erb
+    // asinxron gorc@ntac@ barehajox avartvel e isk reject@ ayn jamanak erb hajoxutyamb chi avartvel
+
+const F1 = ( () => {
+    return new Promise( (resolve, reject) => {
+        resolve('new-1')
+    } )
+} )
+
+    const F2 = ( () => {
+        return new Promise( (resolve, reject) => {
+            setTimeout( () => {
+                resolve('new-2')
+            }, 2000 )
+        } )
+    } )
+
+    const F3 = ( () => {
+      return new Promise( (resolve, reject) => {
+          resolve('new-3')
+      } )
+    })
+
+    F1()
+        .then( (msg) => {
+            console.log(msg)
+            return F2()
+        } )
+        .then( (msg) => {
+            console.log(msg)
+            return F3()
+        } )
+        .then( (msg) => {
+            console.log(msg)
+        } )
+        .catch( (err) => {
+            console.log(err)
+        } )
+
+
+    // const F1 = ( () => {
+    //     return new Promise( (resolve, reject) => {
+    //         resolve()
+    //     } )
+    // } )
+    //
+    // const F2 = ( () => {
+    //     return new Promise( (resolve, reject) => {
+    //         setTimeout( () => {
+    //             resolve()
+    //         }, 2000 )
+    //     } )
+    // } )
+    //
+    // const F3 = ( () => {
+    //     return new Promise( (resolve, reject) => {
+    //         resolve()
+    //     } )
+    // })
+    //
+    // F1()
+    //     .then( (msg) => {
+    //         console.log('11')
+    //         return F2()
+    //     } )
+    //     .then( (msg) => {
+    //         console.log('22')
+    //         return F3()
+    //     } )
+    //     .then( (msg) => {
+    //         console.log('33')
+    //     } )
+    //     .catch( (err) => {
+    //         console.log(err)
+    //     } )
+
+
+
+
+
+
+
+</script>
+</body>
+</html>

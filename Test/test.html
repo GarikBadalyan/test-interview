@@ -46,40 +46,43 @@
   // console.log('result111', result);
   //
 
-  generateCombinations(str) {
-    let regex = RegExp(/{([^{}]+)}/g);
 
-    let match = regex.exec(str);
-    if (!match) {
-      return [str];
-    }
-    let parts = match[1].split('|');
-    let combinations = [];  parts.forEach(part => {
-      let newStr = str.replace(match[0], part);
-      let newCombinations = this.generateCombinations(newStr);
-      combinations.push(...newCombinations);  });
-    return combinations;
-  },
+  // let person1 = { name: "Shameel", age: 29};
+  // let person2 = person1;
+  // person2.name = "Sam1";
+  // console.log('person1', person1);
+  // console.log('person2', person2);
 
-  handleFpNameInput(value) {
-    const lines = this.generateCombinations(value);
+  // let a = 5;
+  // let b = a;
+  // console.log('b', b)
+  //
+  // b = 10
+  // console.log('a', a)
+  // console.log('b', b)
+  //
+  // let arr1 = [1,2,3]
+  // let arr2 = arr1
+  // arr2.push(4)
+  // console.log('arr1', arr1)
+  // console.log('arr2', arr2)
 
-    console.log('lines', lines);
-    console.log('value', value) ;
-    let linesCounter = 0;
-    for (const account of this.accounts.selected) {
-      if (linesCounter < lines.length) {
-        console.log('11111');
-        this.dialogData.accounts[account.id].fpName = lines[linesCounter];
-        linesCounter++;
-      } else {
-        console.log('AAAA');
-        linesCounter = 0;
-        this.dialogData.accounts[account.id].fpName = lines[linesCounter];
-      }
-    }
-  },
 
+  let a = {
+    name:'AAA',
+    age: 23,
+    lastName: "OOOyan"
+  }
+  console.log('a', a)
+  let k = {
+    name:'AAA111',
+    age: 2322,
+    lastName: "OOOyan1111",
+    ttt: 'VVV'
+  }
+
+  a = { ...a , ...k }
+  console.log('aaaa', a)
 </script>
 </body>
 </html>

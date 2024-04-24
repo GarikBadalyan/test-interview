@@ -1,0 +1,33 @@
+<!doctype html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport"
+          content="width=device-width, user-scalable=no, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>Document</title>
+</head>
+<body>
+
+<script>
+    // Как клонировать массив?
+    let arr = [1, 2, 3]
+
+    let copyArr = [...arr]
+    console.log('copyArr', copyArr)
+    let copyArr1 = Array.from(arr)
+    console.log('copyArr1', copyArr1)
+    ////////////////////////////
+    // Как клонировать объект?
+    const originalObject = { key: 'value' };
+    const clonedObject = { ...originalObject };
+    console.log('clonedObject', clonedObject)
+
+    // Использование такой библиотеки, как Lodash: Библиотека Lodash предоставляет cloneфункцию,
+    // которая позволяет создавать глубокую клон объекта, более эффективно обрабатывая сложные случаи.
+        const originalObject1 = { key1: 'value1' };
+    const clonedObject2 = _.cloneDeep(originalObject1);
+    // Requires Lodash library
+</script>
+</body>
+</html>

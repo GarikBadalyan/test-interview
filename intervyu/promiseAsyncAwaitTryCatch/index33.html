@@ -1,0 +1,87 @@
+<!doctype html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport"
+          content="width=device-width, user-scalable=no, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>Document</title>
+</head>
+<body>
+
+<script>
+    // const F1 = () => {
+    //     return new Promise( (resolve, reject) => {
+    //         resolve()
+    //     } )
+    // }
+    //
+    // const F2 = () => {
+    //     return new Promise( (resolve, reject) => {
+    //         setTimeout( () => {
+    //             resolve()
+    //         }, 2000 )
+    //     } )
+    // }
+    //
+    // const F3 = () => {
+    //     return new Promise( (resolve, reject) => {
+    //         resolve()
+    //     })
+    // }
+    //
+    // F1()
+    //    .then( () => {
+    //        console.log('111')
+    //        return F2()
+    //    } )
+    // .then( () => {
+    //     console.log('222222')
+    //     return F3()
+    // } )
+    // .then( () => {
+    //     console.log('3333333')
+    // } )
+    // .catch( (e) => {
+    //     console.log(e)
+    // })
+
+
+const F1 = () => {
+    return new Promise( (resolve, reject) => {
+        resolve()
+    } )
+}
+
+const F2 = () => {
+    return new Promise((resolve, reject) => {
+      setTimeout( () => {
+          resolve()
+      }, 2000 )
+    })
+}
+
+    const F3 = () => {
+        return new Promise( (resolve, reject) => {
+            resolve()
+        } )
+    }
+
+    F1()
+    .then(() => {
+        console.log('111')
+        return F2()
+    })
+    .then(() => {
+        console.log('222')
+        return F3()
+    })
+    .then( () => {
+        console.log('333')
+    } )
+    .catch((e) => {
+        console.log(e)
+    })
+</script>
+</body>
+</html>

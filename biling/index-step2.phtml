@@ -1,0 +1,285 @@
+<script type="text/javascript" >
+    <?php $stextparts = array_map("addslashes", array_map("trim", explode("\n", $this->post['message']))); ?>
+
+    $(document).ready(function(){
+        var report = [];
+        var PostQuery = <?php echo Zend\Json\Json::encode($this->post); ?>;
+
+        var ClientQuery = function( input, callback ){
+            this.input    = input;
+            this.callback = callback;
+        };
+
+        ClientQuery.prototype = {
+            query: function( Next ){
+                var pThis = this;
+                $(pThis.input).parent().parent()
+                    .find('span.status').html('<img src="/Images/loader.white.gif" />');
+                PostQuery.clientid = this.input.value;
+                $.ajax({
+                    type: 'POST',
+                    dataType: 'json',
+                    url: Sjx.Ajax.getUrl('dc.spam.send'),
+                    data: PostQuery,
+                    success: function( data ){
+                        if (typeof data.debug !== 'undefined') {
+                            delete data.debug;
+                        }
+                        if(data.success){
+                            $(pThis.input).parent().parent()
+                                .find('span.status').html('<font color="green" >' + _js("Выполнено!") + '</font>');
+                        }else{
+                            $(pThis.input).parent().parent()
+                                .find('span.status').html('<font color="red" >' + _js("Ошибка!") + '<br/>'+data.error+'</font>');
+                        }
+                        data.client.clientid = PostQuery.clientid;
+                        report.push(data);
+
+                        if(pThis.callback){
+                            pThis.callback();
+                        }
+
+                        if(Next){
+                            Next.execute();
+                        }
+                    },
+                    error: function(){}
+                });
+            }
+        };
+
+        function toggleTestEmailInput() {
+            var isChecked = $('input.testEmail').prop('checked');
+            if (isChecked) {
+                $('input[name="test_email"]').show();
+            } else {
+                $('input[name="test_email"]').hide();
+            }
+        }
+
+        toggleTestEmailInput();
+
+        $('input.testEmail').change(function() {
+            toggleTestEmailInput();
+        });
+
+
+
+        var LinkedList = function(){
+            this.next = null;
+            this.clientQuery = null;
+        };
+        LinkedList.prototype = {
+
+            insert: function( ClientQuery ){
+                if(this.next){
+                    this.next.insert(ClientQuery);
+                }else{
+                    this.clientQuery = ClientQuery;
+                    this.next        = new LinkedList();
+                }
+            },
+
+            execute: function(){
+                if(this.clientQuery){
+                    this.clientQuery.query( this.next );
+                }else{
+                    sendReport();
+                }
+            }
+        };
+
+        function clearDocumentsFolder()
+        {
+            $.ajax({
+                type: 'POST',
+                dataType: 'json',
+                url: Sjx.Ajax.getUrl('dc.spam.clear-documents-folder'),
+                success: function(){
+                    alert(_js('Рассылка успешно выполнена!'));
+                }
+            });
+        }
+
+        function sendReport()
+        {
+            $('input.email').attr('disabled', false);
+            pbar.updateProgress(0, _js('Формирование отчета...'));
+
+            PostQuery.report = report;
+            $.ajax({
+                type: 'POST',
+                dataType: 'json',
+                url: Sjx.Ajax.getUrl('dc.spam.send-report'),
+                data: PostQuery,
+                success: function(data){
+                    if(data.success){
+                        pbar.updateProgress(1, _js('Рассылка успешно выполнена!'));
+                    }else{
+                        pbar.updateProgress(1, '<font color="red" >'+data.error+'</fotn>');
+                    }
+                    $('#status_loader').html('');
+
+                    clearDocumentsFolder();
+                },
+                error: function(){ alert('error'); }
+            });
+        }
+
+
+        $('#execute').click(function(){
+            if($('input.email:checked').length) {
+                report = [];
+                $('input.email').attr('disabled', 'disabled');
+                $('#status_loader').html('<img src="/Images/loader.white.gif" />');
+                var ll = new LinkedList();
+
+                if ($('input.testEmail').prop('checked')) {
+                    console.log('aaa')
+                    var testEmail = $('input[name="test_email"]').val();
+                    if (testEmail.trim() === '') {
+                        alert(_js('Please provide a test email address!'));
+                        return;
+                    }
+                    ll.insert(new ClientQuery($('input[name="test_email"]')[0], function () {
+                        var progress = report.length / 1;
+                        pbar.updateProgress(progress, _js('Отправка писем') + ': ' + Math.round(100 * progress) + '%');
+                    }));
+                } else {
+                    console.log('bbb')
+                    $('input.email:checked').each(function (index, input) {
+                        ll.insert(new ClientQuery(input, function () {
+                            var allinputs = $('input.email:checked').length;
+                            var progress = report.length / allinputs;
+                            pbar.updateProgress(progress, _js('Отправка писем') + ': ' + Math.round(100 * progress) + '%');
+                        }));
+                    });
+                }
+
+                ll.execute();
+            } else {
+                alert(_js('Не выбрано ни одного Клиента!'));
+            }
+        });
+
+        $('#back').click(function(){
+            document.location = Sjx.Ajax.getUrl('dc.spam.index');
+        });
+
+        function calcStatistics() {
+            $('#statistics').html($('input.email').length + '/' + $('input.email:checked').length);
+        }
+
+        $('#checkall').click(function(){
+            $('input.email').attr('checked', (this.checked ? 'checked': false));
+            calcStatistics();
+        });
+
+        $('input.email').click(function(){
+            calcStatistics();
+        });
+
+        calcStatistics();
+
+        var pbar = Ext.create('Ext.ProgressBar', {
+            text: '',
+            id:'pbar',
+            width: 250,
+            renderTo:'status'
+        });
+    });
+</script>
+<style>
+    #scrollbar { background-color: #d1ebff; width: 0px; height: 15px; }
+    #scrollbar_contener { width: 200px; height: 15px; border:1px solid blue; }
+    #report_table tbody tr td { border-bottom: 1px solid #ccc; }
+</style>
+<table width="100%" border="1" cellspacing="0" cellpadding="0" rules="none" >
+    <tr><th class="menu"><?= _('Рассылка уведомлений'); ?><a class="confluence" href="<?= $this->getConfig('confluence.url'); ?>=19300398">
+                <img src="/Images/help.png" alt="<?= _('Подробнее в Confluence'); ?>" title="Confluence"></a></th>
+    </tr>
+    <tr><td>
+            <fieldset>
+                <legend><?= _('Статистика'); ?></legend>
+                <table>
+                    <tr>
+                        <td><?= _('Клиентов') . '/' . _('выбрано'); ?>:</td>
+                        <td><div id="statistics" ></div></td>
+                        <td></td>
+                    </tr>
+                    <tr>
+                        <td><?= _('Статус рассылки'); ?>:</td>
+                        <td><div id="status" ></div></td>
+                        <td><div id="status_loader" ></div></td>
+                        <td style="padding:2px 4px; display: flex; align-items: center" ">
+                        <input style="margin-left: 52px; margin-right: 10px" type="checkbox" name="testEmail" class="testEmail"" />
+                        <label><?= _('Тестовая рассылка') ?></label>
+        </td>
+        <td><input type="email" name="test_email" value="<?php echo $this->getValue($this->post, 'test_email'); ?>" style="width: 250px; font-size: 13px; margin-left: 34px" /></td>
+    </tr>
+</table>
+</fieldset>
+<div align="center" style="padding: 10px;">
+    <input type="button" id="back" value="<?=_('Назад');?>" />
+    <input type="button" id="execute" value="<?= _('Выполнить рассылку'); ?>" />
+</div>
+<table cellspacing="0" cellpadding="4" width="100%" id="report_table" >
+    <thead>
+    <th><input type="checkbox" id="checkall" checked /></th>
+    <th><?= _('Клиент') ?></th>
+    <th width="150"><?= _('Emails') ?></th>
+    <?php if ($this->withServers): ?>
+        <th width="210">%SERVERS%</th>
+    <?php endif; ?>
+    <?php if ($this->withDomains): ?>
+        <th width="210">%DOMAINS%</th>
+    <?php endif; ?>
+    <?php if ($this->withObjects): ?>
+        <th width="210">%OBJECTS%</th>
+    <?php endif; ?>
+    <th><?= _('Статус') ?></th>
+    </thead>
+    <tbody>
+    <?php $subsort = 0; ?>
+    <?php foreach( $this->emailsList as $clientId=>$client): ?>
+
+        <?php if($subsort != $client['subsort']){ ?>
+            <?php $subsort = $client['subsort']; ?>
+            <tr valign="top">
+                <th colspan="<?= (5 + (int) $this->withServers + (int) $this->withDomains) ?>" style="background: #999; color: #fff;" >Версия V<?php echo $subsort >= 2 ? 2 : 1; ?></th>
+            </tr>
+        <?php } ?>
+        <tr valign="top">
+            <td style="padding:2px 4px;" align="center">
+                <input type="checkbox" name="clientid" class="email" value="<?php echo $clientId; ?>" checked />
+            </td>
+            <td><a target="_blank" href="<?php echo $this->getUrlByLink('app.client.card', array('clientid' => $clientId)); ?>" ><?php
+                    echo $client['internalname']; ?></a>
+            </td>
+            <td><?php
+                $emailFields = array('yuremail1', 'yuremail2', 'yuremail3', 'yuremail4');
+                $emails      = array();
+                foreach($emailFields as $email){
+                    if($client[$email] != ''){
+                        $emails[] = $client[$email];
+                    }
+                }
+                echo join('<br/>', $emails); ?>
+            </td>
+            <?php if ($this->withServers): ?>
+                <td><?php echo join('<br/>', $client['servers']); ?></td>
+            <?php endif; ?>
+            <?php if ($this->withDomains): ?>
+                <td><?php echo join('<br/>', $client['domains']); ?></td>
+            <?php endif; ?>
+            <?php if ($this->withObjects): ?>
+                <td><?php echo join('<br/>', $client['objects']); ?></td>
+            <?php endif; ?>
+            <td align="center" ><span class="status" ><?= _('Неотправлено'); ?></span></td>
+        </tr>
+    <?php endforeach; ?>
+    </tbody>
+</table>
+</td>
+</tr>
+</table>

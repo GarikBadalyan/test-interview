@@ -1,0 +1,40 @@
+<!doctype html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport"
+          content="width=device-width, user-scalable=no, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>Document</title>
+</head>
+<body>
+
+<script>
+    let obj = {
+        name: 'Nar'
+    }
+    console.log(obj.name)
+    let proxyObj = new Proxy(obj, {})
+// erku depqum el nuynn e tpelu
+    console.log(proxyObj.name)
+
+
+
+    let objkt = {
+        name: 'Garik'
+    }
+    console.log(objkt.name)
+    let proxyObjkt = new Proxy(objkt, {
+        get: function (target, p, receiver){
+            if(p === 'name') {
+                console.log('AAAA VVVVV NNNN ')
+                return target[p]
+            }
+            return Reflect.get(...arguments)
+        }
+    })
+
+    console.log(proxyObjkt.name)
+</script>
+</body>
+</html>
